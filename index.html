@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Souven 的文学小站</title>
+<style>
+:root { --bg-color: #f7f5f0; --text-color: #333333; --accent-color: #8c7b6d; }
+body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); font-family: "Noto Serif SC", "Songti SC", serif; line-height: 1.8; letter-spacing: 0.5px; }
+nav { position: fixed; top: 0; width: 100%; background: rgba(247, 245, 240, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid #e0dcd3; z-index: 1000; display: flex; justify-content: center; padding: 15px 0; }
+nav a { text-decoration: none; color: var(--text-color); margin: 0 20px; font-size: 1.1rem; transition: color 0.3s ease; }
+nav a:hover { color: var(--accent-color); }
+header { text-align: center; padding: 150px 20px 80px 20px; }
+header h1 { font-size: 3rem; margin-bottom: 10px; font-weight: 500; }
+header p { color: #666; font-size: 1.2rem; font-style: italic; }
+.container { max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; }
+.section-title { font-size: 1.8rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; display: inline-block; }
+.article-list { list-style: none; padding: 0; }
+.article-list li { margin-bottom: 20px; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.3s ease; }
+.article-list li:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+.article-list a { text-decoration: none; color: var(--text-color); font-size: 1.3rem; font-weight: bold; }
+.article-list a:hover { color: var(--accent-color); }
+.article-date { display: block; font-size: 0.9rem; color: #999; margin-top: 8px; }
+.article-desc { font-size: 1rem; color: #555; margin-top: 10px; }
+.easter-egg-container { text-align: center; margin-top: 50px; padding-bottom: 50px; }
+.easter-egg { color: #ccc; cursor: pointer; font-size: 0.9rem; transition: all 0.5s ease; }
+.easter-egg:hover { color: var(--accent-color); letter-spacing: 2px; font-style: italic; }
+</style>
+</head>
+<body>
+<nav><a href="#home">首页</a><a href="#works">作品集</a><a href="#about">关于我</a></nav>
+<header id="home"><h1>Souven</h1><p>“文字是时间的灰烬，也是灵魂的避难所。”</p></header>
+<div class="container" id="works">
+<h2 class="section-title">最新作品</h2>
+<ul class="article-list">
+<li><a href="#">《棱角》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
+<li><a href="#">《囚欲·Locked Love》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
+<li><a href="#">《邮差》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
+<li><a href="#">《小红帽》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
+</ul>
+</div>
+<div class="container" id="about" style="padding-top: 50px;">
+<h2 class="section-title">关于 Souven</h2>
+<p>听说夕阳是个浪漫主义者。</p>
+</div>
+<div class="easter-egg-container"><span class="easter-egg">❤️ 如果你看到了这里，说明你懂我。 (点击/悬停试试)</span></div>
+</body>
+  </html>
