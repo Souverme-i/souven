@@ -3,46 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Souven 的文学小站</title>
+<title>Souven 个人文学官网 | 文字避难所</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root { --bg-color: #f7f5f0; --text-color: #333333; --accent-color: #8c7b6d; }
-body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); font-family: "Noto Serif SC", "Songti SC", serif; line-height: 1.8; letter-spacing: 0.5px; }
-nav { position: fixed; top: 0; width: 100%; background: rgba(247, 245, 240, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid #e0dcd3; z-index: 1000; display: flex; justify-content: center; padding: 15px 0; }
-nav a { text-decoration: none; color: var(--text-color); margin: 0 20px; font-size: 1.1rem; transition: color 0.3s ease; }
-nav a:hover { color: var(--accent-color); }
-header { text-align: center; padding: 150px 20px 80px 20px; }
-header h1 { font-size: 3rem; margin-bottom: 10px; font-weight: 500; }
-header p { color: #666; font-size: 1.2rem; font-style: italic; }
-.container { max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; }
-.section-title { font-size: 1.8rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; display: inline-block; }
-.article-list { list-style: none; padding: 0; }
-.article-list li { margin-bottom: 20px; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.3s ease; }
-.article-list li:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-.article-list a { text-decoration: none; color: var(--text-color); font-size: 1.3rem; font-weight: bold; }
-.article-list a:hover { color: var(--accent-color); }
-.article-date { display: block; font-size: 0.9rem; color: #999; margin-top: 8px; }
-.article-desc { font-size: 1rem; color: #555; margin-top: 10px; }
-.easter-egg-container { text-align: center; margin-top: 50px; padding-bottom: 50px; }
-.easter-egg { color: #ccc; cursor: pointer; font-size: 0.9rem; transition: all 0.5s ease; }
-.easter-egg:hover { color: var(--accent-color); letter-spacing: 2px; font-style: italic; }
+    :root { 
+        --bg-color: #f7f5f0; 
+        --text-main: #2c2c2c; 
+        --text-light: #888888; 
+        --accent-color: #a48e7d; 
+    }
+    body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: "Noto Serif SC", "Songti SC", serif; line-height: 2.4; letter-spacing: 1.5px; font-weight: 300; -webkit-font-smoothing: antialiased; }
+    nav { position: fixed; top: 0; width: 100%; background: rgba(247, 245, 240, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.03); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px 0; }
+    nav a { text-decoration: none; color: var(--text-light); margin: 0 25px; font-size: 0.85rem; transition: color 0.4s ease; letter-spacing: 2px; }
+    nav a:hover { color: var(--text-main); }
+    header { text-align: center; padding: 220px 20px 140px 20px; animation: fadeIn 1.5s ease-out; }
+    header h1 { font-size: 2.8rem; margin-bottom: 25px; font-weight: 300; letter-spacing: 8px; }
+    header h1 span { font-size: 0.75rem; color: var(--accent-color); display: block; letter-spacing: 6px; margin-bottom: 25px; text-transform: uppercase; }
+    header p { color: var(--text-light); font-size: 0.95rem; font-style: italic; max-width: 600px; margin: 0 auto; letter-spacing: 2px; }
+    .container { max-width: 680px; margin: 0 auto; padding: 0 20px 120px 20px; }
+    .section-title { font-size: 1.1rem; font-weight: 400; margin-bottom: 50px; display: flex; align-items: center; color: var(--text-main); letter-spacing: 3px; }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(0,0,0,0.08) 0%, transparent 100%); margin-left: 20px; }
+    .article-list { list-style: none; padding: 0; }
+    .article-list li { margin-bottom: 35px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); transition: all 0.4s ease; }
+    .article-list li:hover { padding-left: 10px; border-bottom-color: var(--accent-color); }
+    .article-list a { text-decoration: none; color: var(--text-main); font-size: 1.15rem; font-weight: 400; display: inline-block; transition: color 0.3s; }
+    .article-list a:hover { color: var(--accent-color); }
+    .article-date { display: inline-block; font-size: 0.75rem; color: var(--text-light); margin-left: 20px; letter-spacing: 1px; }
+    .article-desc { font-size: 0.85rem; color: var(--text-light); margin-top: 10px; margin-bottom: 0; line-height: 1.8; }
+    .about-text { color: var(--text-light); font-size: 0.9rem; line-height: 2.4; text-align: justify; margin-bottom: 60px; padding: 0 10px; }
+    .about-text p { margin-bottom: 25px; }
+    .dev-entry-container { margin-top: 40px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; cursor: pointer; transition: opacity 0.3s; }
+    .dev-entry-container:hover { opacity: 0.7; }
+    .dev-entry-container h3 { margin-top: 0; color: var(--text-light); font-weight: 300; font-size: 0.8rem; letter-spacing: 4px; margin-bottom: 40px; }
+    .dev-horizontal-list { display: flex; justify-content: center; align-items: center; }
+    .dev-item { flex: 1; padding: 10px; }
+    .dev-item h4 { margin: 0; color: var(--text-main); font-size: 0.95rem; font-weight: 400; letter-spacing: 2px; }
+    .dev-item p { margin: 8px 0 0 0; font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
+    .divider { width: 1px; height: 30px; background: rgba(0,0,0,0.08); }
+    .faq-section { margin-bottom: 80px; }
+    details { border-bottom: 1px solid rgba(0,0,0,0.04); padding: 18px 0; }
+    summary { cursor: pointer; font-size: 0.85rem; color: var(--text-main); list-style: none; position: relative; outline: none; transition: color 0.3s; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "＋"; position: absolute; right: 0; top: 0; color: var(--text-light); font-size: 0.9rem; transition: transform 0.4s; }
+    details[open] summary::after { transform: rotate(45deg); color: var(--accent-color); }
+    .faq-answer { font-size: 0.8rem; color: var(--text-light); margin-top: 15px; line-height: 2; padding-right: 20px; }
+    .form-box { margin-top: 20px; }
+    .form-box p { font-size: 0.85rem; color: var(--text-light); line-height: 2.2; text-align: justify; margin-bottom: 40px; }
+    .form-group { display: flex; flex-direction: column; gap: 20px; }
+    .form-group input, .form-group textarea { padding: 15px 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.1); font-family: inherit; font-size: 0.85rem; background: transparent; transition: border 0.3s; letter-spacing: 1px; border-radius: 0; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-bottom-color: var(--text-main); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group button { align-self: flex-start; padding: 12px 40px; background: transparent; color: var(--text-main); border: 1px solid rgba(0,0,0,0.15); border-radius: 30px; cursor: pointer; font-size: 0.85rem; letter-spacing: 4px; transition: all 0.4s; font-family: inherit; margin-top: 10px; }
+    .form-group button:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+    
+    /* 额外联系邮箱样式 */
+    .contact-email-box { text-align: center; margin-top: 40px; font-size: 0.85rem; color: var(--text-light); }
+    .contact-email-box a { color: var(--accent-color); text-decoration: none; transition: color 0.3s; border-bottom: 1px dashed var(--accent-color); }
+    .contact-email-box a:hover { color: var(--text-main); border-bottom-color: var(--text-main); }
+
+    .privacy-box { font-size: 0.7rem; color: #aaa; padding: 30px 0 0 0; margin-top: 60px; line-height: 2; border-top: 1px solid rgba(0,0,0,0.04); text-align: justify; }
+    .privacy-box strong { color: #888; font-weight: normal; }
+    .stats-box { text-align: center; color: #bbb; font-size: 0.7rem; margin-top: 80px; letter-spacing: 2px; }
+    .easter-egg-container { text-align: center; margin-top: 30px; padding-bottom: 60px; }
+    .easter-egg { color: #ddd; cursor: pointer; font-size: 0.75rem; transition: all 0.5s ease; letter-spacing: 1px; }
+    .easter-egg:hover { color: var(--accent-color); letter-spacing: 3px; font-style: italic; }
+    .footer-copyright { text-align: center; color: #ccc; font-size: 0.65rem; padding-bottom: 40px; letter-spacing: 1px; line-height: 2; }
+    #dev-space { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #f7f5f0; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+    .dev-space-title { font-size: 1.8rem; color: var(--text-main); margin-bottom: 10px; font-weight: 300; letter-spacing: 6px; }
+    .dev-space-subtitle { font-size: 0.8rem; color: var(--text-light); margin-bottom: 50px; letter-spacing: 3px; }
+    .close-dev-btn { position: absolute; top: 30px; right: 30px; background: transparent; border: none; font-size: 1.2rem; color: var(--text-light); cursor: pointer; }
+    .flip-card { background-color: transparent; width: 240px; height: 320px; perspective: 1000px; cursor: pointer; margin: 15px; }
+    .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; padding: 20px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.04); }
+    .flip-card-back { background: var(--text-main); color: #fff; transform: rotateY(180deg); border: none; }
+    .dev-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 25px; background: #eee; filter: grayscale(20%); }
+    .flip-card-front h4 { margin: 0; color: var(--text-main); font-size: 1.1rem; font-weight: 400; letter-spacing: 2px; }
+    .flip-card-front p { font-size: 0.75rem; color: var(--text-light); margin-top: 10px; letter-spacing: 1px; }
+    .flip-card-back p { font-size: 0.9rem; line-height: 2; padding: 0 10px; font-style: italic; font-weight: 300; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-<nav><a href="#home">首页</a><a href="#works">作品集</a><a href="#about">关于我</a></nav>
-<header id="home"><h1>Souven</h1><p>“文字是时间的灰烬，也是灵魂的避难所。”</p></header>
-<div class="container" id="works">
-<h2 class="section-title">最新作品</h2>
-<ul class="article-list">
-<li><a href="#">《棱角》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
-<li><a href="#">《囚欲·Locked Love》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
-<li><a href="#">《邮差》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
-<li><a href="#">《小红帽》</a><span class="article-date">最新发布</span><p class="article-desc">点击阅读全文...</p></li>
-</ul>
-</div>
-<div class="container" id="about" style="padding-top: 50px;">
-<h2 class="section-title">关于 Souven</h2>
-<p>听说夕阳是个浪漫主义者。</p>
-</div>
-<div class="easter-egg-container"><span class="easter-egg">❤️ 如果你看到了这里，说明你懂我。 (点击/悬停试试)</span></div>
+
+    <nav><a href="#home">首页</a><a href="#works">作品集</a><a href="#about">关于</a></nav>
+    
+    <header id="home">
+        <h1><span>OFFICIAL WEBSITE</span>Souven</h1>
+        <p>“文字是时间的灰烬，也是灵魂的避难所。”</p>
+    </header>
+
+    <div class="container" id="works">
+        <h2 class="section-title">作 品</h2>
+        <ul class="article-list">
+            <li><a href="#">《棱角》</a><span class="article-date">2026.10</span><p class="article-desc">我们都在被世界打磨，却总想留住一点锋芒。</p></li>
+            <li><a href="#">《囚欲·Locked Love》</a><span class="article-date">2026.10</span><p class="article-desc">以爱为名的牢笼，锁住的是欲望还是你我。</p></li>
+            <li><a href="#">《邮差》</a><span class="article-date">2026.10</span><p class="article-desc">有些信，永远送不到收件人手里。</p></li>
+            <li><a href="#">《小红帽》</a><span class="article-date">2026.10</span><p class="article-desc">童话的背面，往往藏着更深的黑暗。</p></li>
+            <li><a href="#">《我的君主又逃学了》</a><span class="article-date">2026.10</span><p class="article-desc">王座之上，是一个不愿长大的灵魂。</p></li>
+        </ul>
+    </div>
+
+    <div class="container" id="about">
+        <h2 class="section-title">关 于</h2>
+        <div class="about-text">
+            <p>你好，我是 Souven。这里是属于我的一处私人文学自留地。</p>
+            <p>听说夕阳是个浪漫主义者，所以我总在黄昏时分写点东西。没有宏大的叙事，只有一些破碎的情绪、未完成的梦境，和对这个世界的微小抵抗。</p>
+        </div>
+        
+        <div class="dev-entry-container" onclick="showDevLogin()">
+            <h3>THE DREAMERS</h3>
+            <div class="dev-horizontal-list">
+                <div class="dev-item"><h4>Souven</h4><p>文字与视觉</p></div>
+                <div class="divider"></div>
+                <div class="dev-item"><h4>Wuntun</h4><p>技术与搭建</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">帮 助 与 反 馈</h2>
+        
+        <div class="faq-section">
+            <div class="faq-title" style="font-size: 0.9rem; color: var(--text-main); font-weight: 500; margin-bottom: 20px;">常见问题</div>
+            <details>
+                <summary>为什么有些作品点击后无法跳转？</summary>
+                <div class="faq-answer">目前小站正在逐步完善中，部分作品的正文页面还在排版上传。这是一个慢慢添砖加瓦的过程，敬请见谅，我会尽快补齐。</div>
+            </details>
+            <details>
+                <summary>互动文学（如摄像头）会泄露隐私吗？</summary>
+                <div class="faq-answer">绝对不会。所有硬件权限均需您的主动授权，且画面与音频仅在您的设备本地运行，绝不会上传至服务器，请放心体验。</div>
+            </details>
+            <details>
+                <summary>加载网页或背景音乐时有些卡顿？</summary>
+                <div class="faq-answer">本站服务器位于海外，国内部分网络环境（尤其是晚高峰）可能会出现短暂的加载缓慢，切换网络或稍后重试即可。</div>
+            </details>
+        </div>
+
+        <div class="form-box">
+            <p>如果你有任何想说的话，或者想与我一同在这座小岛上留下痕迹，欢迎写信给我。我会看，也会回。</p>
+            <!-- 预留 Formspree 接口，若未注册则暂不可用 -->
+            <form action="https://formspree.io/f/你的专属ID" method="POST" class="form-group">
+                <input type="text" name="_gotcha" style="display:none">
+                <input type="text" name="nickname" placeholder="你的名字" required>
+                <input type="email" name="_replyto" placeholder="你的邮箱（选填）">
+                <textarea name="message" placeholder="你想说些什么..." required></textarea>
+                <button type="submit">寄 出</button>
+            </form>
+        </div>
+
+        <!-- 额外联系邮箱提示 -->
+        <div class="contact-email-box">
+            <p>若您的反馈或建议未被及时看见，可通过邮箱直接联系：<br><a href="mailto:3619605348@qq.com">3619605348@qq.com</a></p>
+        </div>
+
+        <div class="privacy-box">
+            <strong>隐私声明：</strong>本站不收集您的真实身份。留言表单提供的邮箱仅用于私密沟通。未来可能上线的互动文学均需您的主动授权，且仅在您的设备本地运行。本站使用无痕统计记录访问量。
+        </div>
+
+        <div class="stats-box" id="busuanzi_container_site_pv">
+            👁️ <span id="busuanzi_value_site_pv">...</span> 次访问 | <span id="busuanzi_value_site_uv">...</span> 位过客
+        </div>
+
+        <div class="easter-egg-container"><span class="easter-egg">如果你看到了这里，说明你懂我。</span></div>
+    </div>
+    
+    <div class="footer-copyright">© 2026 Souven. All Rights Reserved. <br> 本站所有文学作品版权归原作者所有。</div>
+
+    <div id="dev-login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: transparent; padding: 30px; text-align: center; width: 80%; max-width: 300px;">
+            <h3 style="color: var(--text-main); margin-top: 0; font-weight: 300; letter-spacing: 4px;">内部验证</h3>
+            <input type="password" id="dev-password" placeholder="输入暗号" style="padding: 15px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 20px; text-align: center; background: transparent; font-family: inherit; letter-spacing: 2px;">
+            <button onclick="checkDevPassword()" style="padding: 12px; background: var(--text-main); color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-bottom: 10px; letter-spacing: 2px;">进入</button>
+            <button onclick="closeDevLogin()" style="padding: 12px; background: transparent; color: var(--text-light); border: none; cursor: pointer; width: 100%; font-size: 0.8rem;">取消</button>
+        </div>
+    </div>
+
+    <div id="dev-space">
+        <button class="close-dev-btn" onclick="closeDevSpace()">✕</button>
+        <h1 class="dev-space-title">造梦者空间</h1>
+        <p class="dev-space-subtitle">THE DREAMERS BEHIND THE SITE</p>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="1791002556212.jpeg" alt="Souven" class="dev-avatar">
+                        <h4>Souven</h4><p>文字与视觉</p>
+                    </div>
+                    <div class="flip-card-back"><p>“听说夕阳是个浪漫主义者。感谢你点开这个隐藏的世界，这里是我们的灵魂避难所。”</p></div>
+                </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="wuntun.jpeg" alt="Wuntun" class="dev-avatar">
+                        <h4>Wuntun</h4><p>技术与搭建</p>
+                    </div>
+                    <div class="flip-card-back"><p>“每一行代码都是砖瓦，愿这座属于文字的岛屿，永远宁静温暖。”</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="dev-bgm" loop><source src="https://music.163.com/song/media/outer/url?id=1974443814.mp3" type="audio/mpeg"></audio>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.0/busuanzi.pure.mini.js"></script>
+
+    <script>
+        const SECRET_KEY = "SOUVEN"; 
+        function showDevLogin() { document.getElementById('dev-login-modal').style.display = 'flex'; }
+        function closeDevLogin() { document.getElementById('dev-login-modal').style.display = 'none'; }
+        function checkDevPassword() {
+            const input = document.getElementById('dev-password').value;
+            if (input.toUpperCase() === SECRET_KEY) {
+                closeDevLogin();
+                document.getElementById('dev-space').style.display = 'flex';
+                document.getElementById('dev-bgm').play().catch(e => console.log("需交互"));
+                document.getElementById('dev-password').value = '';
+            } else { alert("暗号错误！"); }
+        }
+        function closeDevSpace() {
+            document.getElementById('dev-space').style.display = 'none';
+            document.getElementById('dev-bgm').pause();
+        }
+    </script>
 </body>
-  </html>
+</html>
