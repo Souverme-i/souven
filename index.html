@@ -141,10 +141,13 @@
 
         <div class="form-box">
             <p>如果你有任何想说的话，或者想与我一同在这座小岛上留下痕迹，欢迎写信给我。我会看，也会回。</p>
-            <form action="https://formspree.io/f/你的专属ID" method="POST" class="form-group">
-                <input type="text" name="_gotcha" style="display:none">
-                <input type="text" name="nickname" placeholder="你的名字" required>
-                <input type="email" name="_replyto" placeholder="你的邮箱（选填）">
+            <!-- 替换成了 Web3Forms 的发送接口 -->
+            <form action="https://api.web3forms.com/submit" method="POST" class="form-group">
+                <input type="hidden" name="access_key" value="2c3348dc-88a7-4929-84f1">
+                <input type="hidden" name="subject" value="来自 Souven 文学小站的反馈">
+                <input type="checkbox" name="botcheck" style="display:none">
+                <input type="text" name="name" placeholder="你的名字" required>
+                <input type="email" name="email" placeholder="你的邮箱（选填）">
                 <textarea name="message" placeholder="你想说些什么..." required></textarea>
                 <button type="submit">寄 出</button>
             </form>
@@ -195,7 +198,7 @@
             <div class="flip-card" onclick="this.classList.toggle('flipped')">
                 <div class="flip-card-inner">
                     <div class="flip-card-front">
-                        <!-- 这里换成了你那张长名字的图 -->
+                        <!-- 这里直接引用了你那张长名字的图片 -->
                         <img src="Screenshot_2026-10-24-14-00-26-01_2332cb9b27b851b548ba47a91682926c.jpg" alt="Wuntun" class="dev-avatar">
                         <h4>Wuntun</h4><p>技术与搭建</p>
                     </div>
