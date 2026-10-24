@@ -56,7 +56,6 @@
     .form-group button { align-self: flex-start; padding: 12px 40px; background: transparent; color: var(--text-main); border: 1px solid rgba(0,0,0,0.15); border-radius: 30px; cursor: pointer; font-size: 0.85rem; letter-spacing: 4px; transition: all 0.4s; font-family: inherit; margin-top: 10px; }
     .form-group button:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
     
-    /* 额外联系邮箱样式 */
     .contact-email-box { text-align: center; margin-top: 40px; font-size: 0.85rem; color: var(--text-light); }
     .contact-email-box a { color: var(--accent-color); text-decoration: none; transition: color 0.3s; border-bottom: 1px dashed var(--accent-color); }
     .contact-email-box a:hover { color: var(--text-main); border-bottom-color: var(--text-main); }
@@ -142,7 +141,6 @@
 
         <div class="form-box">
             <p>如果你有任何想说的话，或者想与我一同在这座小岛上留下痕迹，欢迎写信给我。我会看，也会回。</p>
-            <!-- 预留 Formspree 接口，若未注册则暂不可用 -->
             <form action="https://formspree.io/f/你的专属ID" method="POST" class="form-group">
                 <input type="text" name="_gotcha" style="display:none">
                 <input type="text" name="nickname" placeholder="你的名字" required>
@@ -152,7 +150,6 @@
             </form>
         </div>
 
-        <!-- 额外联系邮箱提示 -->
         <div class="contact-email-box">
             <p>若您的反馈或建议未被及时看见，可通过邮箱直接联系：<br><a href="mailto:3619605348@qq.com">3619605348@qq.com</a></p>
         </div>
@@ -198,7 +195,8 @@
             <div class="flip-card" onclick="this.classList.toggle('flipped')">
                 <div class="flip-card-inner">
                     <div class="flip-card-front">
-                        <img src="wuntun.jpeg" alt="Wuntun" class="dev-avatar">
+                        <!-- 这里换成了你那张长名字的图 -->
+                        <img src="Screenshot_2026-10-24-14-00-26-01_2332cb9b27b851b548ba47a91682926c.jpg" alt="Wuntun" class="dev-avatar">
                         <h4>Wuntun</h4><p>技术与搭建</p>
                     </div>
                     <div class="flip-card-back"><p>“每一行代码都是砖瓦，愿这座属于文字的岛屿，永远宁静温暖。”</p></div>
