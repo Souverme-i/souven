@@ -48,16 +48,8 @@
     .dev-item p { margin: 8px 0 0 0; font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
     .divider { width: 1px; height: 30px; background: rgba(0,0,0,0.08); }
     
-    /* ======= 全新功能：主界面隐藏模块（深夜电台） ======= */
-    #hidden-module { 
-        display: none; /* 默认隐藏 */
-        margin-top: 60px; 
-        padding: 40px 20px; 
-        background: rgba(0,0,0,0.02); 
-        border: 1px dashed var(--accent-color); 
-        border-radius: 8px;
-        animation: fadeIn 1.5s ease-out;
-    }
+    /* 隐藏模块 */
+    #hidden-module { display: none; margin-top: 60px; padding: 40px 20px; background: rgba(0,0,0,0.02); border: 1px dashed var(--accent-color); border-radius: 8px; animation: fadeIn 1.5s ease-out; }
     #hidden-module h3 { color: var(--accent-color); font-weight: 400; letter-spacing: 4px; margin-top: 0; font-size: 1rem; text-align: center; }
     #hidden-module p { font-size: 0.8rem; color: var(--text-light); text-align: center; margin-bottom: 20px; }
     .frequency-list { list-style: none; padding: 0; margin: 0; }
@@ -165,7 +157,7 @@
             </div>
         </div>
 
-        <!-- ================= 解锁后凭空出现的隐藏模块 ================= -->
+        <!-- 隐藏模块 -->
         <div id="hidden-module">
             <h3>📻 深夜频道 (THE MIDNIGHT FREQUENCY)</h3>
             <p>因为你的成功解锁，主界面为你开启了隐藏的「深夜电台」模块。</p>
@@ -175,7 +167,6 @@
                 <li>“有些话风一吹就散了，但写在这里，星光会替你记得。” <span>—— 来自隐藏频道的回声</span></li>
             </ul>
         </div>
-        <!-- =========================================================== -->
     </div>
 
     <div class="container">
@@ -276,9 +267,9 @@
         </div>
     </div>
 
-    <!-- 双声道音频：替换成了完整的高品质轻音乐链接 -->
-    <audio id="audio-souven" loop><source src="https://music.163.com/song/media/outer/url?id=139774" type="audio/mpeg"></audio> <!-- River Flows in You 完整版 -->
-    <audio id="audio-wuntun" loop><source src="https://music.163.com/song/media/outer/url?id=5233392" type="audio/mpeg"></audio> <!-- 天空之城 钢琴版 -->
+    <!-- 双声道音频：Souven用网易云，Wuntun用永不失效的开源直链 -->
+    <audio id="audio-souven" loop><source src="https://music.163.com/song/media/outer/url?id=139774" type="audio/mpeg"></audio>
+    <audio id="audio-wuntun" loop><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"></audio>
     
     <script async src="//busuanzi.ibruce.info/busuanzi/2.0/busuanzi.pure.mini.js"></script>
 
@@ -308,9 +299,7 @@
                 unlockBtn.innerText = '[ 造梦者空间已解锁 ]';
                 unlockBtn.classList.add('unlocked');
                 
-                // 关键功能：让主界面的隐藏模块显示出来！
                 document.getElementById('hidden-module').style.display = 'block';
-                // 自动滚动到隐藏模块，给用户惊喜
                 setTimeout(() => {
                     document.getElementById('hidden-module').scrollIntoView({behavior: "smooth", block: "center"});
                 }, 300);
