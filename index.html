@@ -15,12 +15,10 @@
     
     body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: "Noto Serif SC", "Songti SC", serif; line-height: 2.4; letter-spacing: 1.5px; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     
-    /* 顶部导航 */
     nav { position: fixed; top: 0; width: 100%; background: rgba(247, 245, 240, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.03); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px 0; }
     nav a { text-decoration: none; color: var(--text-light); margin: 0 25px; font-size: 0.85rem; transition: color 0.4s ease; letter-spacing: 2px; }
     nav a:hover { color: var(--text-main); }
     
-    /* 头部 */
     header { text-align: center; padding: 220px 20px 140px 20px; animation: fadeIn 1.5s ease-out; }
     header h1 { font-size: 2.8rem; margin-bottom: 25px; font-weight: 300; letter-spacing: 8px; }
     header h1 span { font-size: 0.75rem; color: var(--accent-color); display: block; letter-spacing: 6px; margin-bottom: 25px; text-transform: uppercase; }
@@ -30,7 +28,6 @@
     .section-title { font-size: 1.1rem; font-weight: 400; margin-bottom: 50px; display: flex; align-items: center; color: var(--text-main); letter-spacing: 3px; }
     .section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(0,0,0,0.08) 0%, transparent 100%); margin-left: 20px; }
     
-    /* 作品列表 */
     .article-list { list-style: none; padding: 0; }
     .article-list li { margin-bottom: 35px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); transition: all 0.4s ease; }
     .article-list li:hover { padding-left: 10px; border-bottom-color: var(--accent-color); }
@@ -39,11 +36,9 @@
     .article-date { display: inline-block; font-size: 0.75rem; color: var(--text-light); margin-left: 20px; letter-spacing: 1px; }
     .article-desc { font-size: 0.85rem; color: var(--text-light); margin-top: 10px; margin-bottom: 0; line-height: 1.8; }
     
-    /* 关于 */
     .about-text { color: var(--text-light); font-size: 0.9rem; line-height: 2.4; text-align: justify; margin-bottom: 60px; padding: 0 10px; }
     .about-text p { margin-bottom: 25px; }
     
-    /* 开发者入口 */
     .dev-entry-container { margin-top: 40px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; transition: all 0.4s ease; }
     .dev-entry-container h3 { margin-top: 0; color: var(--text-main); font-weight: 400; font-size: 0.9rem; letter-spacing: 4px; margin-bottom: 20px; }
     .dev-entry-container p { font-size: 0.8rem; color: var(--text-light); letter-spacing: 2px; margin: 0; }
@@ -53,7 +48,6 @@
     .dev-item p { margin: 8px 0 0 0; font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
     .divider { width: 1px; height: 30px; background: rgba(0,0,0,0.08); }
     
-    /* 隐藏模块 */
     #hidden-module { display: none; margin-top: 60px; padding: 40px 20px; background: rgba(0,0,0,0.02); border: 1px dashed var(--accent-color); border-radius: 8px; animation: fadeIn 1.5s ease-out; }
     #hidden-module h3 { color: var(--accent-color); font-weight: 400; letter-spacing: 4px; margin-top: 0; font-size: 1rem; text-align: center; }
     #hidden-module p { font-size: 0.8rem; color: var(--text-light); text-align: center; margin-bottom: 20px; }
@@ -65,7 +59,6 @@
     .unlock-status:hover { color: var(--accent-color); }
     .unlock-status.unlocked { color: var(--accent-color); font-weight: 500; }
 
-    /* FAQ & 表单 */
     .faq-section { margin-bottom: 80px; }
     details { border-bottom: 1px solid rgba(0,0,0,0.04); padding: 18px 0; }
     summary { cursor: pointer; font-size: 0.85rem; color: var(--text-main); list-style: none; position: relative; outline: none; transition: color 0.3s; }
@@ -95,7 +88,7 @@
     .easter-egg:hover { color: var(--accent-color); letter-spacing: 3px; font-style: italic; }
     .footer-copyright { text-align: center; color: #ccc; font-size: 0.65rem; padding-bottom: 40px; letter-spacing: 1px; line-height: 2; }
 
-    /* 开发者空间 */
+    /* 开发者空间（纯悬浮+唱臂） */
     #dev-space { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #121212; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 40px 20px; box-sizing: border-box; color: #eee; font-family: sans-serif; }
     .close-dev-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #ccc; font-size: 1rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; }
     .close-dev-btn:hover { background: #fff; color: #000; }
@@ -127,74 +120,19 @@
     .switch-btn p { margin: 5px 0 0 0; font-size: 0.75rem; color: #888; }
     .dev-quote { font-family: "Noto Serif SC", serif; font-style: italic; font-size: 0.9rem; color: #aaa; line-height: 2; padding: 0 20px; min-height: 80px; }
     .quote-mark { font-size: 2rem; color: #555; line-height: 0; display: block; margin-bottom: 10px; }
-
-    /* ================= 新增：版本更新公告弹窗 ================= */
-    #update-modal {
-        display: none; /* 默认隐藏 */
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
-        z-index: 99999; justify-content: center; align-items: center;
-    }
-    .update-box {
-        background: var(--bg-color); width: 85%; max-width: 400px;
-        border-radius: 12px; padding: 30px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        border: 1px solid rgba(0,0,0,0.05); position: relative;
-        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .update-box h2 { font-size: 1.1rem; font-weight: 500; margin-top: 0; margin-bottom: 20px; color: var(--text-main); letter-spacing: 2px; text-align: center; border-bottom: 1px dashed var(--accent-color); padding-bottom: 15px; }
-    .update-content { font-size: 0.85rem; color: var(--text-light); line-height: 2; max-height: 40vh; overflow-y: auto; padding-right: 10px; margin-bottom: 25px; }
-    .update-content p { margin: 5px 0; }
-    .update-content strong { color: var(--text-main); font-weight: 500; }
-    .update-btn { display: block; width: 100%; padding: 12px; background: var(--text-main); color: #fff; text-align: center; border: none; border-radius: 6px; font-family: inherit; font-size: 0.9rem; letter-spacing: 2px; cursor: pointer; transition: background 0.3s; }
-    .update-btn:hover { background: var(--accent-color); }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-
-    <!-- ================= 版本更新弹窗 ================= -->
-    <div id="update-modal">
-        <div class="update-box">
-            <h2>📢 站点 V3.02 更新公告</h2>
-            <div class="update-content">
-                <p>感谢您来到 Souven 的文学小站。本次更新为您带来了以下改变：</p>
-                <p><strong>✨ 新增内容：</strong><br>
-                1. 全新互动悬疑作品《诡异的镜子：还是个原相机》正式上线（需摄像头权限）。<br>
-                2. 主界面新增隐秘的“造梦者空间”，内置双人电台。</p>
-                
-                <p><strong>🎨 优化体验：</strong><br>
-                1. 全站视觉重塑，采用“复古纸张”质感与留白排版。<br>
-                2. 所有作品正文接入独立背景音乐与悬浮播放器。<br>
-                3. 升级了黑胶唱片机的悬浮 UI 与唱臂机械感。</p>
-                
-                <p><strong>🛠️ 修复缺陷：</strong><br>
-                1. 修复了反馈表单因密钥截断导致无法发送的 Bug。<br>
-                2. 修复了部分移动端浏览器下拉刷新的白屏漏洞。<br>
-                3. 优化了暗号解锁机制，避免重复弹窗干扰。</p>
-                
-                <p><strong>🔒 隐私升级：</strong><br>
-                新增数据隐私声明，所有硬件权限仅在本地调用，绝不侵犯隐私。</p>
-                
-                <p style="text-align: right; margin-top: 15px; font-size: 0.75rem;">—— Souven 2026.10</p>
-            </div>
-            <button class="update-btn" onclick="closeUpdateModal()">我知道了，进入小站</button>
-        </div>
-    </div>
-
     <nav><a href="#home">首页</a><a href="#works">作品集</a><a href="#about">关于</a></nav>
+    <header id="home"><h1><span>OFFICIAL WEBSITE</span>Souven</h1><p>“文字是时间的灰烬，也是灵魂的避难所。”</p></header>
     
-    <header id="home">
-        <h1><span>OFFICIAL WEBSITE</span>Souven</h1>
-        <p>“文字是时间的灰烬，也是灵魂的避难所。”</p>
-    </header>
-
     <div class="container" id="works">
         <h2 class="section-title">作 品</h2>
         <ul class="article-list">
+            <!-- 链接绝对校准 -->
             <li><a href="story1.html">《棱角》</a><span class="article-date">2026.10</span><p class="article-desc">我们都在被世界打磨，却总想留住一点锋芒。</p></li>
-            <li><a href="story_mirror.html">《诡异的镜子：还是个原相机》</a><span class="article-date">互动悬疑</span><p class="article-desc">以为是小说，点开却是一面真实的镜子。</p></li>
+            <li><a href="story2.html">《诡异的镜子：还是个原相机》</a><span class="article-date">互动悬疑</span><p class="article-desc">以为是小说，点开却是一面真实的镜子。</p></li>
             <li><a href="story3.html">《邮差》</a><span class="article-date">2026.10</span><p class="article-desc">有些信，永远送不到收件人手里。</p></li>
             <li><a href="story4.html">《小红帽》</a><span class="article-date">2026.10</span><p class="article-desc">童话的背面，往往藏着更深的黑暗。</p></li>
             <li><a href="story5.html">《我的君主又逃学了》</a><span class="article-date">2026.10</span><p class="article-desc">王座之上，是一个不愿长大的灵魂。</p></li>
@@ -340,21 +278,6 @@
     <script async src="//busuanzi.ibruce.info/busuanzi/2.0/busuanzi.pure.mini.js"></script>
 
     <script>
-        // 弹窗逻辑：页面加载后检查本地存储
-        window.onload = function() {
-            const hasSeenUpdate = localStorage.getItem('souven_update_v3.02');
-            if (!hasSeenUpdate) {
-                document.getElementById('update-modal').style.display = 'flex';
-            }
-        };
-
-        function closeUpdateModal() {
-            document.getElementById('update-modal').style.display = 'none';
-            // 写入本地存储，以后不再弹出
-            localStorage.setItem('souven_update_v3.02', 'true');
-        }
-
-        // 开发者空间逻辑
         const SECRET_KEY = "SOUVEN"; 
         let isUnlocked = false;
         let currentChannel = 'souven';
