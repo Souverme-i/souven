@@ -27,13 +27,27 @@
     .article-content { font-size: 1.05rem; text-align: justify; }
     .article-content p { margin-top: 0; margin-bottom: 1.5em; text-indent: 2em; }
     .article-content p.no-indent { text-indent: 0; }
-    
-    /* 章节标题样式 */
-    .chapter-title { font-weight: 500; font-size: 1.2rem; margin-top: 2em; margin-bottom: 1em; color: var(--text-main); text-indent: 0; }
 
     .article-footer { text-align: center; margin-top: 80px; color: var(--accent-color); letter-spacing: 8px; font-size: 0.9rem; }
 
+    /* 悬浮音乐播放器样式 */
+    #music-player {
+        position: fixed; bottom: 30px; right: 30px; z-index: 999; 
+        cursor: pointer; display: flex; align-items: center; justify-content: center; 
+        width: 48px; height: 48px; border-radius: 50%; 
+        background: rgba(255, 255, 255, 0.9); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+        backdrop-filter: blur(5px); 
+        transition: all 0.4s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    #music-player:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    #music-icon { font-size: 1.3rem; color: var(--accent-color); transition: transform 0.3s; }
+    #music-player.playing #music-icon { animation: rotate 4s linear infinite; }
+    #music-player.playing { background: var(--bg-color); border-color: var(--accent-color); }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes rotate { 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -41,6 +55,16 @@
     <div class="top-nav">
         <a href="index.html" class="back-btn">返回主页</a>
     </div>
+
+    <!-- 悬浮音乐按钮（位于右下角） -->
+    <div id="music-player" onclick="toggleMusic()">
+        <span id="music-icon">🎵</span>
+    </div>
+    
+    <!-- 背景音乐音频（适配《棱角》的孤独感钢琴曲） -->
+    <audio id="bg-music" loop>
+        <source src="https://music.163.com/song/media/outer/url?id=139774.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="article-wrapper">
         <div class="article-header">
@@ -989,6 +1013,27 @@
             · 完 ·
         </div>
     </div>
+
+    <!-- 音乐控制脚本 -->
+    <script>
+        let isPlaying = false;
+        const audio = document.getElementById('bg-music');
+        const icon = document.getElementById('music-icon');
+        const player = document.getElementById('music-player');
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                icon.innerText = '🎵';
+                player.classList.remove('playing');
+            } else {
+                audio.play();
+                icon.innerText = '⏸';
+                player.classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
 
 </body>
 </html>
