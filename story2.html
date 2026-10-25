@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《诡异的镜子：还是个原相机》 - Souven</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+    :root { 
+        --bg-color: #050505; 
+        --text-main: #cccccc; 
+        --text-light: #555555; 
+        --accent-color: #8b0000; 
+    }
+    
+    body { 
+        margin: 0; padding: 0; 
+        background-color: var(--bg-color); 
+        color: var(--text-main); 
+        font-family: "Noto Serif SC", "Songti SC", serif; 
+        display: flex; flex-direction: column; 
+        align-items: center; justify-content: center; 
+        min-height: 100vh; overflow: hidden; 
+        letter-spacing: 2px;
+    }
+
+    .state-screen { text-align: center; padding: 20px; z-index: 10; display: none; }
+    .state-screen.active { display: block; animation: appear 1.5s ease-out; }
+
+    h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: 4px; margin-bottom: 20px; color: var(--text-main); text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    p { font-size: 0.9rem; color: var(--text-light); line-height: 2; margin-bottom: 40px; }
+    .small-hint { font-size: 0.7rem; color: #333; margin-bottom: 30px; letter-spacing: 1px; }
+
+    button { 
+        padding: 14px 45px; background: transparent; color: #888; 
+        border: 1px solid #222; border-radius: 2px; font-family: inherit; 
+        font-size: 0.95rem; letter-spacing: 6px; cursor: pointer; 
+        transition: all 0.4s ease; 
+        animation: breathe 3s infinite alternate;
+    }
+    button:hover { border-color: var(--accent-color); color: #fff; background: rgba(139,0,0,0.1); }
+    button:active { transform: scale(0.96); }
+
+    .back-btn { position: absolute; top: 30px; left: 30px; color: #333; text-decoration: none; font-size: 0.8rem; transition: color 0.3s; z-index: 100; }
+    .back-btn:hover { color: #888; }
+
+    #mirror-video { 
+        display: none; position: fixed; top: 0; left: 0; 
+        width: 100vw; height: 100vh; object-fit: cover; z-index: 1; 
+        transform: scaleX(-1); 
+        filter: grayscale(80%) contrast(150%) brightness(0.6) sepia(20%); 
+    }
+    
+    #mirror-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; }
+    
+    #whisper { 
+        position: absolute; bottom: 15%; width: 100%; text-align: center; 
+        color: rgba(200,0,0,0.9); font-size: 1.3rem; font-family: "Noto Serif SC", serif;
+        letter-spacing: 10px; text-shadow: 0 0 15px rgba(0,0,0,1); opacity: 0; transition: opacity 4s ease; 
+        animation: flicker 4s infinite alternate; 
+    }
+    
+    #exit-btn { 
+        pointer-events: auto; position: absolute; bottom: 5%; left: 50%; 
+        transform: translateX(-50%); border-color: rgba(255,255,255,0.05); 
+        color: rgba(255,255,255,0.2); font-size: 0.75rem; padding: 8px 25px; 
+        animation: none; 
+    }
+    #exit-btn:hover { color: var(--accent-color); border-color: var(--accent-color); background: rgba(0,0,0,0.9); }
+
+    @keyframes appear { from { opacity: 0; filter: blur(10px); transform: scale(1.1); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+    @keyframes breathe { from { box-shadow: 0 0 0px rgba(139,0,0,0); } to { box-shadow: 0 0 20px rgba(139,0,0,0.2); } }
+    @keyframes flicker { 0% { opacity: 0.8; } 20% { opacity: 1; } 22% { opacity: 0.5; } 40% { opacity: 1; } 100% { opacity: 0.9; } }
+
+    .dark-out { animation: blackOut 2s forwards; }
+    @keyframes blackOut { 0% { background-color: #050505; } 50% { background-color: #000; } 100% { background-color: #000; } }
+</style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn">← 退出仪式</a>
+
+    <!-- 沉浸式恐怖环境音（不需要按钮，点击照镜子自动播放） -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_6b8b6c7c2c.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="state-screen active" id="state-start">
+        <h1>《诡异的镜子：还是个原相机》</h1>
+        <p>我以为这是一篇恐怖小说。<br>直到它打开了我的前置摄像头。</p>
+        <p class="small-hint">*本作是真实的互动体验，需调用前置摄像头。<br>画面仅在您的设备本地显示，绝不上传。</p>
+        <button onclick="startMirror()">照 镜 子</button>
+    </div>
+
+    <div class="state-screen" id="state-broken">
+        <h1 style="color: var(--accent-color);">镜面碎裂</h1>
+        <p>你退缩了。<br>镜子里的东西也松了口气。</p>
+        <p class="small-hint">由于未获得摄像头权限，或者这里没有镜子，故事无法继续。</p>
+        <button onclick="resetState()">退 出</button>
+    </div>
+
+    <video id="mirror-video" autoplay playsinline muted></video>
+    <div id="mirror-overlay">
+        <div id="whisper">“ 你，终于来了。 ”</div>
+        <button id="exit-btn" onclick="stopMirror()">移开视线 (退出)</button>
+    </div>
+
+<script>
+let currentStream = null;
+const bgm = document.getElementById('bg-music');
+
+function showState(stateId) {
+    document.querySelectorAll('.state-screen').forEach(el => el.classList.remove('active'));
+    if(stateId) {
+        document.getElementById(stateId).classList.add('active');
+    }
+}
+
+function startMirror() {
+    // 1. 尝试播放背景音乐（利用用户点击触发）
+    bgm.volume = 0.5;
+    bgm.play().catch(e => console.log("音乐被浏览器拦截"));
+
+    // 2. 请求前置摄像头
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+    .then(function(stream) {
+        currentStream = stream;
+        const video = document.getElementById('mirror-video');
+        video.srcObject = stream;
+        
+        showState(null); 
+        video.style.display = 'block';
+        document.getElementById('mirror-overlay').style.display = 'block';
+        
+        setTimeout(() => {
+            document.getElementById('whisper').style.opacity = '1';
+        }, 3000);
+    })
+    .catch(function(err) {
+        console.warn("摄像头打开失败: ", err);
+        // 如果失败，停止音乐并黑屏
+        bgm.pause();
+        document.body.classList.add('dark-out');
+        setTimeout(() => {
+            showState('state-broken');
+        }, 500);
+    });
+}
+
+function stopMirror() {
+    // 1. 关闭摄像头轨道
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+    }
+    // 2. 停止音乐
+    bgm.pause();
+    bgm.currentTime = 0; // 重置进度
+
+    const video = document.getElementById('mirror-video');
+    video.srcObject = null;
+    video.style.display = 'none';
+    document.getElementById('mirror-overlay').style.display = 'none';
+    document.getElementById('whisper').style.opacity = '0';
+    
+    document.body.classList.remove('dark-out');
+    resetState();
+}
+
+function resetState() {
+    showState('state-start');
+}
+</script>
+</body>
+</html>
