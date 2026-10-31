@@ -11,23 +11,45 @@
         --text-main: #2c2c2c; 
         --text-light: #888888; 
         --accent-color: #a48e7d; 
+        --font-family: "Noto Serif SC", "Songti SC", serif;
     }
     
-    body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: "Noto Serif SC", "Songti SC", serif; line-height: 2.4; letter-spacing: 1.5px; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    /* 🚨 极客终端模式专属样式 */
+    body.geek-mode {
+        --bg-color: #0a0a0a; 
+        --text-main: #33ff00; 
+        --text-light: #1e991e; 
+        --accent-color: #33ff00; 
+        --font-family: "Courier New", Courier, monospace;
+    }
+    
+    body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: var(--font-family); line-height: 2.4; letter-spacing: 1.5px; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: all 0.5s ease; }
     
     nav { position: fixed; top: 0; width: 100%; background: rgba(247, 245, 240, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.03); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px 0; }
-    nav a { text-decoration: none; color: var(--text-light); margin: 0 25px; font-size: 0.85rem; transition: color 0.4s ease; letter-spacing: 2px; }
+    /* 在极客模式下，导航栏变黑 */
+    body.geek-mode nav { background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #1e991e; }
+    
+    nav a { text-decoration: none; color: var(--text-light); margin: 0 20px; font-size: 0.85rem; transition: color 0.4s ease; letter-spacing: 2px; cursor: pointer; }
     nav a:hover { color: var(--text-main); }
     
+    /* 极客模式切换按钮 */
+    .geek-toggle-btn { cursor: pointer; font-size: 1rem; padding: 0 10px; border-left: 1px solid #ccc; margin-left: 10px; }
+    body.geek-mode .geek-toggle-btn { border-left: 1px solid #1e991e; }
+
     header { text-align: center; padding: 220px 20px 140px 20px; animation: fadeIn 1.5s ease-out; }
     header h1 { font-size: 2.8rem; margin-bottom: 25px; font-weight: 300; letter-spacing: 8px; }
     header h1 span { font-size: 0.75rem; color: var(--accent-color); display: block; letter-spacing: 6px; margin-bottom: 25px; text-transform: uppercase; }
     header p { color: var(--text-light); font-size: 0.95rem; font-style: italic; max-width: 600px; margin: 0 auto; letter-spacing: 2px; }
     
+    /* 半透明分割线 */
+    .divider-line { width: 80%; max-width: 680px; height: 1px; background: rgba(0,0,0,0.06); margin: 60px auto; }
+    body.geek-mode .divider-line { background: rgba(51, 255, 0, 0.2); }
+
     .container { max-width: 680px; margin: 0 auto; padding: 0 20px 120px 20px; }
     .section-title { font-size: 1.1rem; font-weight: 400; margin-bottom: 50px; display: flex; align-items: center; color: var(--text-main); letter-spacing: 3px; }
     .section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(0,0,0,0.08) 0%, transparent 100%); margin-left: 20px; }
-    
+    body.geek-mode .section-title::after { background: linear-gradient(to right, rgba(51,255,0,0.2) 0%, transparent 100%); }
+
     .article-list { list-style: none; padding: 0; }
     .article-list li { margin-bottom: 35px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); transition: all 0.4s ease; }
     .article-list li:hover { padding-left: 10px; border-bottom-color: var(--accent-color); }
@@ -40,6 +62,7 @@
     .about-text p { margin-bottom: 25px; }
     
     .dev-entry-container { margin-top: 40px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; transition: all 0.4s ease; }
+    body.geek-mode .dev-entry-container { border-top: 1px solid rgba(51,255,0,0.2); border-bottom: 1px solid rgba(51,255,0,0.2); }
     .dev-entry-container h3 { margin-top: 0; color: var(--text-main); font-weight: 400; font-size: 0.9rem; letter-spacing: 4px; margin-bottom: 20px; }
     .dev-entry-container p { font-size: 0.8rem; color: var(--text-light); letter-spacing: 2px; margin: 0; }
     .dev-horizontal-list { display: flex; justify-content: center; align-items: center; margin-top: 20px;}
@@ -47,7 +70,14 @@
     .dev-item h4 { margin: 0; color: var(--text-main); font-size: 1rem; font-weight: 500; letter-spacing: 2px; }
     .dev-item p { margin: 8px 0 0 0; font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
     .divider { width: 1px; height: 30px; background: rgba(0,0,0,0.08); }
-    
+    body.geek-mode .divider { background: rgba(51,255,0,0.2); }
+
+    /* 仅在极客模式显示的按钮 */
+    .geek-only-btn { display: none; margin-top: 30px; }
+    body.geek-mode .geek-only-btn { display: block; animation: fadeIn 1s; }
+    .source-btn { padding: 10px 25px; background: transparent; border: 1px dashed var(--accent-color); color: var(--text-main); cursor: pointer; border-radius: 4px; font-size: 0.8rem; letter-spacing: 2px; font-family: inherit; transition: all 0.3s; }
+    .source-btn:hover { background: var(--accent-color); color: #000; }
+
     #hidden-module { display: none; margin-top: 60px; padding: 40px 20px; background: rgba(0,0,0,0.02); border: 1px dashed var(--accent-color); border-radius: 8px; animation: fadeIn 1.5s ease-out; }
     #hidden-module h3 { color: var(--accent-color); font-weight: 400; letter-spacing: 4px; margin-top: 0; font-size: 1rem; text-align: center; }
     #hidden-module p { font-size: 0.8rem; color: var(--text-light); text-align: center; margin-bottom: 20px; }
@@ -71,10 +101,12 @@
     .form-box p { font-size: 0.85rem; color: var(--text-light); line-height: 2.2; text-align: justify; margin-bottom: 40px; }
     .form-group { display: flex; flex-direction: column; gap: 20px; }
     .form-group input, .form-group textarea { padding: 15px 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.1); font-family: inherit; font-size: 0.85rem; background: transparent; transition: border 0.3s; letter-spacing: 1px; border-radius: 0; color: var(--text-main);}
+    body.geek-mode .form-group input, body.geek-mode .form-group textarea { border-bottom: 1px solid rgba(51,255,0,0.3); }
     .form-group input:focus, .form-group textarea:focus { outline: none; border-bottom-color: var(--text-main); }
     .form-group textarea { resize: vertical; min-height: 100px; }
     .form-group button { align-self: flex-start; padding: 12px 40px; background: transparent; color: var(--text-main); border: 1px solid rgba(0,0,0,0.15); border-radius: 30px; cursor: pointer; font-size: 0.85rem; letter-spacing: 4px; transition: all 0.4s; font-family: inherit; margin-top: 10px; }
-    .form-group button:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+    body.geek-mode .form-group button { border: 1px solid rgba(51,255,0,0.5); }
+    .form-group button:hover { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
     
     .contact-email-box { text-align: center; margin-top: 40px; font-size: 0.85rem; color: var(--text-light); }
     .contact-email-box a { color: var(--accent-color); text-decoration: none; transition: color 0.3s; border-bottom: 1px dashed var(--accent-color); }
@@ -82,11 +114,14 @@
 
     .privacy-box { font-size: 0.7rem; color: #aaa; padding: 30px 0 0 0; margin-top: 60px; line-height: 2; border-top: 1px solid rgba(0,0,0,0.04); text-align: justify; }
     .privacy-box strong { color: #888; font-weight: normal; }
+    body.geek-mode .privacy-box { color: #1e991e; }
     .stats-box { text-align: center; color: #bbb; font-size: 0.7rem; margin-top: 80px; letter-spacing: 2px; }
+    body.geek-mode .stats-box { color: #1e991e; }
     .easter-egg-container { text-align: center; margin-top: 30px; padding-bottom: 60px; }
     .easter-egg { color: #ddd; cursor: pointer; font-size: 0.75rem; transition: all 0.5s ease; letter-spacing: 1px; }
     .easter-egg:hover { color: var(--accent-color); letter-spacing: 3px; font-style: italic; }
     .footer-copyright { text-align: center; color: #ccc; font-size: 0.65rem; padding-bottom: 40px; letter-spacing: 1px; line-height: 2; }
+    body.geek-mode .footer-copyright { color: #1e991e; }
 
     /* 开发者空间 */
     #dev-space { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #121212; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 40px 20px; box-sizing: border-box; color: #eee; font-family: sans-serif; }
@@ -121,7 +156,7 @@
     .dev-quote { font-family: "Noto Serif SC", serif; font-style: italic; font-size: 0.9rem; color: #aaa; line-height: 2; padding: 0 20px; min-height: 80px; }
     .quote-mark { font-size: 2rem; color: #555; line-height: 0; display: block; margin-bottom: 10px; }
 
-    /* ================= 新增：版本更新公告弹窗 ================= */
+    /* ================= 版本更新公告弹窗 ================= */
     #update-modal {
         display: none; 
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -142,6 +177,17 @@
     .update-btn:hover { background: var(--accent-color); }
     @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
+    /* ================= 开发者源码查看器模态框 ================= */
+    #source-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 100000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+    .source-box { background: #0a0a0a; width: 100%; max-width: 800px; height: 85vh; border: 1px solid #33ff00; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 0 0 30px rgba(51, 255, 0, 0.15); }
+    .source-header { padding: 15px; border-bottom: 1px solid #1e991e; display: flex; justify-content: space-between; align-items: center; color: #33ff00; font-family: monospace; font-size: 0.9rem; }
+    .source-header button { background: transparent; border: 1px solid #33ff00; color: #33ff00; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-family: monospace; transition: 0.3s; }
+    .source-header button:hover { background: #33ff00; color: #000; }
+    .source-warning { padding: 10px 15px; background: rgba(51, 255, 0, 0.1); border-bottom: 1px solid #1e991e; color: #ffcc00; font-family: monospace; font-size: 0.75rem; line-height: 1.6; }
+    .source-content { flex: 1; overflow-y: auto; padding: 20px; color: #33ff00; font-family: "Courier New", Courier, monospace; font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+    .source-content::-webkit-scrollbar { width: 8px; }
+    .source-content::-webkit-scrollbar-thumb { background: #33ff00; border-radius: 4px; }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -150,7 +196,7 @@
     <!-- ================= 版本更新弹窗 ================= -->
     <div id="update-modal">
         <div class="update-box">
-            <h2>📢 站点 V3.02 更新公告</h2>
+            <h2>📢 站点 V4.00 更新公告</h2>
             <div class="update-content">
                 <p>感谢您来到 Souven 的文学小站。本次更新为您带来了以下改变：</p>
                 <p><strong>✨ 新增内容：</strong><br>
@@ -176,7 +222,14 @@
         </div>
     </div>
 
-    <nav><a href="#home">首页</a><a href="#works">作品集</a><a href="#about">关于</a></nav>
+    <nav>
+        <a href="#home">首页</a>
+        <a href="#works">作品集</a>
+        <a href="#about">关于</a>
+        <a href="#faq">帮助与反馈</a>
+        <!-- 极客模式切换按钮 -->
+        <span class="geek-toggle-btn" onclick="toggleUI()" title="切换界面模式">💻</span>
+    </nav>
     <header id="home"><h1><span>OFFICIAL WEBSITE</span>Souven</h1><p>“文字是时间的灰烬，也是灵魂的避难所。”</p></header>
     
     <div class="container" id="works">
@@ -189,6 +242,8 @@
             <li><a href="story5.html">《我的君主又逃学了》</a><span class="article-date">2026.10</span><p class="article-desc">王座之上，是一个不愿长大的灵魂。</p></li>
         </ul>
     </div>
+
+    <div class="divider-line"></div>
 
     <div class="container" id="about">
         <h2 class="section-title">关 于</h2>
@@ -205,6 +260,10 @@
                 <div class="divider"></div>
                 <div class="dev-item"><h4>Wuntun</h4><p>网站共建支持者</p></div>
             </div>
+            <!-- 仅在极客模式下显示的源码查看按钮 -->
+            <div class="geek-only-btn">
+                <button class="source-btn" onclick="viewSource()">> [ 查看当前模块源码 ] <</button>
+            </div>
         </div>
 
         <div id="hidden-module">
@@ -218,7 +277,9 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="divider-line"></div>
+
+    <div class="container" id="faq">
         <h2 class="section-title">帮 助 与 反 馈</h2>
         <div class="faq-section">
             <div class="faq-title" style="font-size: 0.9rem; color: var(--text-main); font-weight: 500; margin-bottom: 20px;">常见问题</div>
@@ -284,22 +345,70 @@
         </div>
     </div>
 
-    <audio id="audio-souven" loop><source src="https://music.163.com/song/media/outer/url?id=139774.mp3" type="audio/mpeg"></audio>
-    <audio id="audio-wuntun" loop><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"></audio>
+    <!-- 开发者源码查看模态框 -->
+    <div id="source-modal">
+        <div class="source-box">
+            <div class="source-header">
+                <span>ROOT@SOUVEN:~# cat index.html</span>
+                <button onclick="closeSource()">✕ 关闭终端</button>
+            </div>
+            <div class="source-warning">
+                ⚠️ [ SYSTEM WARNING ]<br>
+                当前处于只读模式。此处代码仅为静态展示，无法在此直接修改并保存到服务器。<br>
+                若您想体验“修改源码”的沙盒模式，请等待未来的 V5.0 更新。
+            </div>
+            <div class="source-content" id="source-code-display">
+                // 正在读取代码... 请稍候
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-souven" loop><source src="https://music.163.com/song/media/outer/url?id=139774.mp3" type="audio/mpeg">
+    <audio id="audio-wuntun" loop><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     <script async src="//busuanzi.ibruce.info/busuanzi/2.0/busuanzi.pure.mini.js"></script>
     
     <script>
         // 弹窗逻辑
         window.onload = function() {
-            const hasSeenUpdate = localStorage.getItem('souven_update_v3.02');
+            const hasSeenUpdate = localStorage.getItem('souven_update_v4.00');
             if (!hasSeenUpdate) {
                 document.getElementById('update-modal').style.display = 'flex';
+            }
+            // 极客模式恢复
+            const savedMode = localStorage.getItem('souven_ui_mode');
+            if (savedMode === 'geek') {
+                document.body.classList.add('geek-mode');
             }
         };
 
         function closeUpdateModal() {
             document.getElementById('update-modal').style.display = 'none';
-            localStorage.setItem('souven_update_v3.02', 'true');
+            localStorage.setItem('souven_update_v4.00', 'true');
+        }
+
+        // 极客模式切换逻辑
+        function toggleUI() {
+            document.body.classList.toggle('geek-mode');
+            if (document.body.classList.contains('geek-mode')) {
+                localStorage.setItem('souven_ui_mode', 'geek');
+            } else {
+                localStorage.setItem('souven_ui_mode', 'literary');
+            }
+        }
+
+        // 源码提取与查看逻辑
+        function viewSource() {
+            // 获取整个网页的 HTML 结构（这就是纯前端的“查看源码”）
+            let htmlSource = document.documentElement.outerHTML;
+            // 简单格式化，让代码看起来更像代码
+            htmlSource = htmlSource.replace(/</g, '\n<').trim(); 
+            
+            document.getElementById('source-code-display').innerText = htmlSource;
+            document.getElementById('source-modal').style.display = 'flex';
+        }
+
+        function closeSource() {
+            document.getElementById('source-modal').style.display = 'none';
         }
 
         // 开发者空间逻辑
