@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第三根桩 · 互动阅读 - Souven</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e8dcc8;
+    --ink:#2b2620;
+    --wood:#8a6a4a;
+    --red:#a33;
+    --dark:#1a1815;
+    --accent-color: #a48e7d;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--dark);
+    color:var(--ink);
+    font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  /* ---------- 启动界面 ---------- */
+  #intro{
+    width:min(760px,96vw);
+    background:var(--paper);
+    border:1px solid #3a332a;
+    box-shadow:0 0 60px rgba(0,0,0,.7);
+    padding:44px 40px 36px;
+    position:relative;
+    z-index: 10;
+  }
+  #intro h1{
+    font-size:24px;
+    font-weight:normal;
+    letter-spacing:.3em;
+    text-align:center;
+    margin:0 0 6px;
+  }
+  #intro .sub{
+    text-align:center;
+    font-size:13px;
+    color:#6a5f50;
+    letter-spacing:.2em;
+    margin-bottom:26px;
+  }
+  #intro .notice{
+    border:1px dashed #b8a88e;
+    background:rgba(0,0,0,.03);
+    padding:14px 18px;
+    font-size:14px;
+    line-height:1.9;
+    color:#4a4034;
+    margin-bottom:22px;
+  }
+  #intro .notice .hl{color:var(--red);}
+  #intro .enter{
+    display:block;
+    width:100%;
+    padding:12px;
+    font-family:inherit;
+    font-size:15px;
+    letter-spacing:.2em;
+    background:transparent;
+    border:1px solid #7a6a54;
+    color:var(--ink);
+    cursor:pointer;
+    transition:.15s;
+  }
+  #intro .enter:hover{background:#7a6a54;color:var(--paper);}
+
+  /* ---------- 跳过按钮（全局左上角） ---------- */
+  #skipBtn{
+    position:fixed;
+    top:16px;
+    left:16px;
+    z-index:999;
+    font-family:inherit;
+    font-size:13px;
+    letter-spacing:.1em;
+    padding:8px 16px;
+    background:rgba(232,220,200,.92);
+    border:1px solid #7a6a54;
+    color:var(--ink);
+    cursor:pointer;
+    display:none;
+    transition:.15s;
+  }
+  #skipBtn:hover{background:#7a6a54;color:var(--paper);}
+
+  /* ---------- 互动游戏区 ---------- */
+  #game{
+    width:min(720px,96vw);
+    background:var(--paper);
+    border:1px solid #3a332a;
+    box-shadow:0 0 40px rgba(0,0,0,.6);
+    padding:28px 32px 24px;
+    display:none;
+    z-index: 10;
+  }
+  h1.title{
+    font-size:20px;
+    font-weight:normal;
+    letter-spacing:.2em;
+    margin:0 0 4px;
+    text-align:center;
+  }
+  .sub2{
+    text-align:center;
+    font-size:12px;
+    color:#6a5f50;
+    letter-spacing:.15em;
+    margin-bottom:20px;
+  }
+  #stage{
+    min-height:260px;
+    border-top:1px solid #b8a88e;
+    border-bottom:1px solid #b8a88e;
+    padding:18px 0;
+    font-size:15px;
+    line-height:1.9;
+    white-space:pre-wrap;
+  }
+  #stage .year{font-size:13px;color:#7a6a54;letter-spacing:.1em;}
+  #stage .hl{color:var(--red);}
+  #marks{
+    margin:14px 0 4px;
+    padding:10px 12px;
+    background:rgba(0,0,0,.04);
+    border:1px dashed #b8a88e;
+    font-size:13px;
+    color:#5a4f40;
+    min-height:46px;
+    line-height:1.7;
+  }
+  #marks .m{display:inline-block;margin-right:8px;}
+  #choices{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+  #choices button{
+    font-family:inherit;
+    font-size:14px;
+    text-align:left;
+    padding:9px 14px;
+    background:transparent;
+    border:1px solid #7a6a54;
+    color:var(--ink);
+    cursor:pointer;
+    transition:.15s;
+    letter-spacing:.05em;
+  }
+  #choices button:hover:not(:disabled){background:#7a6a54;color:var(--paper);}
+  #choices button:disabled{opacity:.35;cursor:default;border-style:dashed;}
+  #toolbar{
+    margin-top:14px;
+    font-size:12px;
+    color:#6a5f50;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  #log{
+    margin-top:12px;
+    max-height:110px;
+    overflow-y:auto;
+    font-size:12px;
+    color:#5a4f40;
+    border-top:1px dotted #b8a88e;
+    padding-top:8px;
+    line-height:1.7;
+  }
+  #log p{margin:0 0 2px;}
+
+  /* ---------- 正文阅读页 ---------- */
+  #reader{
+    width:min(760px,96vw);
+    max-height:92vh;
+    overflow-y:auto;
+    background:var(--paper);
+    border:1px solid #3a332a;
+    box-shadow:0 0 40px rgba(0,0,0,.6);
+    padding:40px 48px 56px;
+    display:none;
+    line-height:2;
+    font-size:15px;
+    z-index: 10;
+  }
+  #reader h2{
+    font-size:22px;
+    font-weight:normal;
+    letter-spacing:.3em;
+    text-align:center;
+    margin:0 0 6px;
+  }
+  #reader .rsub{
+    text-align:center;
+    font-size:13px;
+    color:#6a5f50;
+    letter-spacing:.2em;
+    margin-bottom:30px;
+  }
+  #reader p{margin:0 0 14px;text-indent:2em;}
+  #reader .divider{
+    text-align:center;
+    color:#a08d70;
+    letter-spacing:.5em;
+    margin:26px 0;
+    text-indent:0;
+  }
+  #reader .back{
+    display:block;
+    margin:40px auto 0;
+    padding:10px 28px;
+    font-family:inherit;
+    font-size:14px;
+    letter-spacing:.15em;
+    background:transparent;
+    border:1px solid #7a6a54;
+    color:var(--ink);
+    cursor:pointer;
+    transition:.15s;
+  }
+  #reader .back:hover{background:#7a6a54;color:var(--paper);}
+
+  /* 悬浮音乐按钮 */
+  #music-player { position: fixed; bottom: 30px; right: 30px; z-index: 999; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(232,220,200,.9); box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); transition: all 0.4s ease; border: 1px solid rgba(0,0,0,0.1); }
+  #music-player:hover { transform: translateY(-3px) scale(1.05); }
+  #music-icon { font-size: 1.3rem; color: var(--red); transition: transform 0.3s; }
+  #music-player.playing #music-icon { animation: rotate 4s linear infinite; }
+  @keyframes rotate { 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- 全局跳过按钮 -->
+<button id="skipBtn">跳过互动 · 直接阅读正文</button>
+
+<!-- 悬浮音乐播放器 -->
+<div id="music-player" onclick="toggleMusic()">
+    <span id="music-icon">🎵</span>
+</div>
+
+<!-- 独特的适配《第三根桩》的音频外链 -->
+<audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_2c3b6a2f4c.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ============ 启动界面 ============ -->
+<div id="intro">
+  <h1>第 三 根 桩</h1>
+  <div class="sub">互动文学 · 刻舟求剑</div>
+
+  <div class="notice">
+    这是一次互动阅读实验。你将用「刻一道记号」的方式，
+    陪虞蘅走过很多个十月十七。<br><br>
+    <span class="hl">该剧情结束后，会自动为您跳转正文阅读页。</span><br><br>
+    如果你并不想参与这个互动操作过程，<span class="hl">左上角有一个「跳过」按钮</span>，
+    可以直接跳过，跳转至对应的正文阅读页。
+  </div>
+
+  <button class="enter" id="enterBtn">进 入 互 动</button>
+</div>
+
+<!-- ============ 互动游戏区 ============ -->
+<div id="game">
+  <h1 class="title">第 三 根 桩</h1>
+  <div class="sub2">互动原型 · 刻舟求剑</div>
+
+  <div id="stage"></div>
+  <div id="marks"></div>
+  <div id="choices"></div>
+  <div id="toolbar">
+    <span id="status"></span>
+    <span id="turn"></span>
+  </div>
+  <div id="log"></div>
+</div>
+
+<!-- ============ 正文阅读页 ============ -->
+<div id="reader">
+  <h2>第 三 根 桩</h2>
+  <div class="rsub">正文阅读</div>
+
+  <p>民国二十三年秋，虞蘅在教会学堂后门的梧桐树下等郗延舟。他迟了半刻钟，手里攥着两张船票，蓝墨水印的，江安号，十月十七夜，汉口。她把票接过来对折再对折，塞进旗袍内袋，说，我偷了我妈的首饰匣。他说，我没什么可偷的，就这条命。她笑了一声，说，命不要，要人。梧桐叶子落下来，落在他肩上，她伸手替他掸了，掸完手没收回去，在他肩上停了一下。他低头看她，她把脸别开，说，看什么。他说，看你。她说，有什么好看的。他说，好看。</p>
+
+  <p>十月十七夜她提前一个时辰到码头。第三根木桩，粗粝的树皮蹭着她月白旗袍的袖口。她从手袋里摸出裁纸刀，在船帮上刻了一道，浅，但看得清。刻完拿指腹抹了抹木屑。江风从下游吹上来，带着煤烟和咸腥。她把首饰匣抱在怀里，盯着下游方向，江安号的烟囱冒着稀薄的黑烟，还没起锚。码头上的人渐渐多了，挑担的、扛包的、送人的、赶船的，声音杂在一起。有个卖糖炒栗子的从她身边过，她买了一包，攥在手里没吃，想着等他来了分着吃。栗子凉了，他还没来。旁边一个等船的妇人问她，小姐等人啊。她说等人。妇人说等多久了。她说一个时辰。妇人说那不算久，我等我男人，等了四个钟头了，船还没靠岸。妇人说完自己笑了，说这码头，等的比到的多。虞蘅没接话。她把栗子往怀里揣了揣，怕凉得太快。</p>
+
+  <p>郗延舟是跑着来的。跑到半路被人截住，四个人，没说话，先一棍子扫在他右腿弯。他跪下去的时候船票还攥在手里，有人掰开他手指把票抽走，当着他面撕成四片扔进江里。纸片在风里翻了两翻就没了。嘴被堵上之前他喊了一声“阿蘅”，声音不大，被码头上的绞盘声盖过去了。那些人把他拖到后巷，又补了几棍，左腿也断了。后巷堆着烂菜叶和煤渣，他趴在煤渣上，脸蹭破了皮，嘴里全是土腥味。他听见码头上的汽笛响了一声，知道船要开了。他爬，从后巷爬回码头，两百来步，爬了半个时辰。手指抠着石板缝，指甲劈了两根。到第三根桩的时候船已经离了岸，江安号的尾灯在江心缩成一粒红点。他看见船尾有个月白的影子，他想喊，嗓子哑了，只有气声。他摸到桩上那道刻痕，指甲抠着木缝，抠出了血。他也在桩上刻了一道，用指甲，浅得几乎看不见。刻完他把额头抵在桩上，抵了很久，煤渣从头发里掉下来，掉在脚边。第二天码头上的力巴扫地，扫到第三根桩旁边，看见地上一摊黑红的印子，拿水冲了。</p>
+
+  <p class="divider">· · ·</p>
+
+  <p>虞蘅在汉口等了一个月。住最便宜的客栈，房间朝北，被褥潮得能拧出水。她每天去码头看进港的船，一条一条看，看到江安号的名字就盯着下船的人。没有他。钱花完了就去当铺当了一只金镯子，镯子是母亲留的，当铺掌柜翻来覆去看了半天，给了个压得很低的价。她又等了半个月，还是没来。客栈老板娘问她等谁，她说等一个人。老板娘说这码头天天有人等，等到的少。回上海那天是腊月，船到十六铺码头，她爹派车来接。车里她爹说郗延舟拿了钱跑了，这种事码头上一抓一把。她没说话，把空首饰匣搁在桌上，上了楼。首饰匣空了，匣底的绒布上还留着镯子的压痕。她把匣子合上，搁进柜子最深处，没再打开。后来她听说，那年码头后巷打死过一个人，没人认尸，拿草席裹了扔在乱葬岗。她去问过，人家说记不清了，那年月死的人多。</p>
+
+  <p>此后每年十月十七，她去码头第三根桩旁站一个时辰。第一年刻一道，第二年刻一道，到第十年那道旧痕被风雨磨浅了，她带了裁纸刀重新刻深。刻的时候手指抖，刀尖滑了一下，在虎口拉了道口子。她拿手帕按住，继续刻完。码头上的力巴认得她，背后叫她“刻字的疯婆子”。有一年一个年轻力巴当着她的面问老力巴，这女的年年在这儿刻什么。老力巴说刻记号。年轻力巴说刻给谁看。老力巴说刻给她自己看。年轻力巴说那有什么用。老力巴说没用，可人家愿意刻。年轻力巴笑了一声，说这码头年年换桩，她刻了也白刻。老力巴说，白刻也是刻。虞蘅听见了，没回头。有一年码头管事嫌桩上刻痕难看，说要换根新桩。她去找管事，说这桩不能换。管事问她为什么。她说上面有记号。管事说记号有什么用。她说有用。管事看了她半天，说，这位同志，码头是公家的，桩是公家的，你刻记号我们没管，你倒管起我们换桩来了。她说我没管你们换桩，我求你们别换这根。管事说求也没用，扩建计划定了。第二年桩还是换了，她发现的时候新桩已经立好了，旧桩不知拉去了哪里。她沿着码头找了一圈，在货栈后面的废料堆里找着了，桩上那几道刻痕还在。她蹲在废料堆旁边看了一会儿，走了。回家拿了把锤子，把旧桩上的刻痕连木带痕凿下来，凿成一块小木牌，揣在怀里。第二天她去新桩上，按老位置估摸着往前挪了几寸，刻了第一道。管事看见了，没说话，背着手走了。</p>
+
+  <p>郗延舟腿瘸了之后不能再教书。教会学堂辞了他，说他腿脚不便，上下楼不安全。他在闸北摆了个代写书信的摊子，一张矮桌，两把竹椅，桌角拿砖头压着。桌上搁着笔墨、信纸、一本翻烂的尺牍大全。他写字右手不抖，左手抖，因为左腿断过之后神经坏了，连带左手也不听使唤。写一封信用半个钟头，收几个铜板。有时人家嫌贵，他就少收两个。有一回来个老太太，让他代写家书给关外的儿子，说着说着哭起来，说三年没信了。他写完没收钱，老太太非要给，他把钱推回去，说下回再给。老太太走了，他坐在摊子后面发了一会儿呆。又有一回来个跑单帮的，让他写封讨债信，说欠钱的在十六铺开铺子。他问欠多少。跑单帮的说八块大洋。他说八块不值得打官司。跑单帮的说我不打官司，我就吓唬吓唬他。他写了，写完念了一遍，跑单帮的说太软了，你再硬点。他又加了两句，跑单帮的满意了，给了五个铜板。他每年十月十七也去码头，远远地，隔着两三百步，靠在货栈墙根底下看。有一年落雨，虞蘅没打伞，站在桩旁边淋着。他把自己的伞撑开，往前走了几步，又退回去。鲁老桅从货栈出来倒水，看见他，说，郗先生，你这条命是捡回来的。他把伞收了，拄着拐走了。第二年他换了顶帽子，压得低，还是站那个位置。有一回他看见她虎口贴了块纱布，知道她刻记号的时候又伤着了。他在摊子上裁了块干净布，想给她送过去，走到半路又拐回来了。布揣在怀里揣了一个月，最后给自己补了裤子。</p>
+
+  <p class="divider">· · ·</p>
+
+  <p>鲁老桅在码头上干了三十七年。光绪二十三年生人，宣统三年十三岁上码头扛包，扛到民国三十八年。他见过的等船人比码头上的石板还多。有一年一个山东来的老娘们，在码头上等她男人，等了三天，后来听说她男人坐的船在半道上沉了，她坐在桩旁边哭了半天，第二天走了，再没来过。又有一年一个穿长衫的先生，每天来码头看船，看了一个月，后来不来了，听说是投了江。码头上的人说起这些事，都说一句“等的人多，到的人少”，说完该扛包扛包，该吃饭吃饭。虞蘅头一年来刻记号的时候他就看见了。他没问。第二年她又来，他还没问。到第五年他忍不住了，从货栈出来倒水，路过她旁边，说，这位小姐，你等的人姓什么。她说姓郗。鲁老桅想了想，码头上的郗姓他认得一个，扛包的郗阿七。他说郗阿七你认得吗。她说那是他弟弟。鲁老桅哦了一声，没再说话。他回去翻了翻工册，找到郗阿七的名字，底下记着一行小字：兄延舟，腿伤，不能扛包。他把工册合上，搁回抽屉里。此后他每年看见她来，就出来倒一趟水。有一年他倒水的时候看见货栈墙根底下站着个瘸子，压着顶帽子，远远地往桩那边看。他认了半天，认出是郗延舟。他没声张，第二天去找郗阿七，说，你哥是不是还在上海。郗阿七说是。鲁老桅说，他每年十月十七去码头，你知道不知道。郗阿七说知道。鲁老桅说，他去看谁。郗阿七不说话。鲁老桅说，我不问了。他走的时候郗阿七叫住他，说鲁叔，你别跟我哥说我晓得他去码头。鲁老桅说我不说。此后每年十月十七，他倒两趟水，一趟给桩旁边的虞蘅看，一趟给货栈墙根底下的郗延舟看。有一年下雨，他看见郗延舟把伞撑开又收回去，他在货栈门口站着，没过去。他想，这两个人，一个在桩这头，一个在墙那头，中间隔了两三百步，谁都不肯先走那两三百步。他倒完水回去，跟货栈里的伙计说，今天雨大，早点关门。伙计说还早呢。他说关门吧，我看着雨要下大。伙计把门关了。他从门缝里往外看，看见虞蘅还站在桩旁边淋着，郗延舟已经走了。他跟伙计说，你看见没有。伙计说看见什么。他说算了。</p>
+
+  <p>民国三十八年上海解放。虞鹤汀要带全家迁港，船票都买好了，虞蘅不去。她爹在客厅里摔了一只花瓶，说你不去就别认我这个爹。她说好。她爹愣了一下，大概没想到她应得这么快。花瓶碎片溅了一地，佣人进来扫，扫完了她爹又说，你一个人留在上海，靠什么活。她说我有手有脚。她爹说你不后悔。她说后悔了再说。她爹走的那天她去送了，在码头，隔着人群看了他一眼。她爹上了船没回头。她站了一会儿，回去上班。她爹走后第三个月寄来一封信，信里没写字，夹了一张汇单，钱不多。她把汇单兑了，存进银行，没动。后来汇单再没来过。纺织厂的同事知道她爹去了香港，有人问她，你爹在香港，你怎么不去。她说不想去。同事说香港多好，花花世界。她说那你去。同事说我又没香港的爹。后来这话传开了，有人说她傻，有人说她心里有人，有人说她脑子有毛病。她听见了也不辩。车间主任找她谈过一次话，说虞蘅同志，你工作是不错的，就是有些个人情况，要注意影响。她说什么个人情况。主任说，你每年那天请假去码头，厂里有人反映。她说我请的是年假。主任说年假也是假，你年年那天请，人家看了有想法。她说那我不请了。第二年十月十七她没请假，下了班去的码头，到的时候天已经黑了，桩上看不清刻痕。她拿手摸了一遍，摸到旧痕，拿锥子补了一道。天黑凿不准，凿偏了，凿在旧痕旁边。她拿手抹了抹，走了。此后每年她下了班去，有时候天还亮着，有时候黑了。黑了她就摸。</p>
+
+  <p class="divider">· · ·</p>
+
+  <p>一九五三年码头扩建。第三根木桩锯掉那天她正好当班，在办公室里隔着窗玻璃看见工人拿电锯切桩子，木屑飞起来，白的。她没下楼。桩子锯完拉走，新桩是水泥的，位置往前挪了几寸。她下班后去看了，蹲下来拿手摸水泥面，粗，但能刻。第二天她带了把锥子，在水泥桩上凿了一道。凿了半个钟头，凿出一道浅槽。水泥渣子掉了一地，她扫干净了才走。从这一年起，她刻记号不用裁纸刀了，改用锥子。刀刻在木头上不费劲，刻在水泥上要凿。她虎口的旧伤还没好利索，凿了两下又裂了。她去医务室要了块纱布缠上，第二天接着凿。医务室的人问她手怎么弄的。她说刻东西刻的。那人说刻什么。她说刻记号。那人说记号拿笔记不行吗。她说不记事，记事。那人没听懂，给了她纱布，让她走了。鲁老桅这时候已经退休了，住在码头后街的平房里。他听说桩子换了，拄着拐棍来看了一趟。看见她在水泥桩上凿，他站在旁边看了一会儿，说，水泥硬。她说硬。他说凿得动吗。她说凿得动。他说那就凿。他走了。此后每年他都来一趟，不说什么，看看槽，走了。有一年他来得早，看见她在凿，就说，我帮你凿两下。她说不用。他说我手劲大。她说不用。他说那我看着。他就站在旁边看着，看她凿完一道，两人一起走了一段路，到岔路口分开。他往东，她往西。</p>
+
+  <p>一九五六年郗延舟终于攒够了勇气。那天不是十月十七，是三月，春天。他瘸着腿走到第三根桩——已经是水泥的了——看见她就站在那儿。头发白了一半，人瘦了，但站得直。他走过去，在离她三步远的地方停下来。她转过头看他，看了很久，说，你老了。他说，你也是。两人在码头的石阶上坐了一下午。她问他吃饭没有，他说吃了。他问她住哪儿，她说纺织厂宿舍。他问她一个人住。她说一个人住。他问她这些年过得好不好。她说还行。她问他腿还疼不疼。他说阴天疼。她说今天没阴天。他说那就不疼。她笑了一下。他问她恨不恨她爹。她说恨过。他说现在还恨吗。她说恨不动了。他问她为什么不走。她说走到哪儿去。他说香港。她说那不是我该去的地方。他就不问了。坐了一会儿，他说，我听说你年年那天来。她说嗯。他说我年年也来。她转过头看他。他说我站在货栈那头。她说我知道。他愣了一下。她说有一年下雨你把伞撑开又收回去，我看见了。他低下头，拿手搓膝盖。她说你怎么不过来。他说我怕连累你。她说你连累我什么。他说你爹的人还在。她说我爹跑了。他说跑了也还有人。她没说话。过了一会儿她说，你腿怎么弄的。他说那天晚上他们打的。她说我猜着了。他说我爬到了，船走了。她说我等到腊月。他说我知道。她说你不知道。傍晚他送她到弄堂口，她说，你明天还来吗。他说，来。她上了楼，从窗户往下看，他还站在弄堂口。她朝他挥了挥手。他也挥了挥手。</p>
+
+  <p>第二天他没来。第三天也没来。她等了半个月，去闸北找他。邻居说他搬走了，留了个铁盒给她。铁盒是装饼干的，盖子锈了，打开来，里头是一张拼起来的船票。四片，拼得整整齐齐，拿浆糊粘在一张硬纸板上，四边裁得笔直。船票背面有一行字，铅笔写的，很淡——“我来了，没失约。腿断了，爬到的。”她把铁盒盖上，在弄堂口站到天黑。邻居出来倒水，看见她，说，你是他什么人。她说我是他朋友。邻居说，他搬走那天说，要是有个女的来找，就把这盒子给她。她说他还说什么。邻居说没说什么，就说了这个。她回码头，在水泥桩上又凿了一道。凿完她蹲在桩旁边，把铁盒抱在怀里，抱了很久。那天晚上她回到宿舍，把铁盒搁在桌上，打开来看了半夜。船票上的字她看了几十遍。第二天她去找鲁老桅，把铁盒给他看。鲁老桅看了半天，说，这是他写的。她说嗯。鲁老桅说，他字写得好。她说嗯。鲁老桅说，我认得他字，他以前给我写过信。她说你让他写过信。鲁老桅说写过，民国三十五年，我娘死了，我让他代写一封家书给我兄弟，他写的，没收钱。她说他为什么不收钱。鲁老桅说他说他是码头挑夫的儿子。她把铁盒收起来，说，我走了。鲁老桅说，你等等。他进屋翻了半天，翻出一张发黄的纸，纸上几行字，落款是郗延舟。他说你拿着。她接过来看了，看完了折好，跟船票搁在一块儿。</p>
+
+  <p class="divider">· · ·</p>
+
+  <p>一九六六年之后那几年，码头上乱，桩上的记号被人拿红漆盖了，写了标语。她等标语褪了色，又拿锥子把记号一道道凿回来。有人问她凿什么，她说凿着玩。那人说这水泥墩子有什么好玩的。她说你看不见。那人说你说什么。她说不说了。鲁老桅那时候腿也不行了，走不动路，在家待着。有一年十月十七他让她替他去码头看看，她说看什么。他说看看桩还在不在。她去了，回来告诉他桩还在。他说好。第二年他又让她去看，她又去了，回来说桩还在。第三年他没让她去，他自己也忘了。一九七六年码头改集装箱。水泥桩全铲了，换成一排铁栏杆，漆成蓝的。她在铁栏杆上没法凿，就用红漆画了一道。画完看了看，风一吹漆味散了。旁边一个年轻工人问她画什么，她说做个记号。工人说这栏杆下个月也要拆的。她说哦。工人说拆了你这记号就没了。她说没了就没了。工人说那你还画。她没说话。工人摇摇头走了。她蹲在栏杆旁边，把红漆笔的盖子拧上，又拧开，在原来那道旁边又画了一道。两道挨着，像一对。画完她站起来，腿麻了，扶着栏杆站了一会儿。旁边另一个工人说，这人年年画，也不知道画给谁看。头一个工人说，画给鬼看呗。</p>
+
+  <p>一九七八年她查出肺癌。没住院，拿了药回宿舍吃。医生说要住院化疗，她说没钱。医生说有公费。她说那也不住。医生看她一眼，说你这病拖不得。她说拖不得就不拖了。医生在病历上写了一行字，她没看。十月十七那天她坐公交去码头，在铁栏杆上画了最后一道漆。手抖得厉害，漆画出去一截。她在江边坐到天黑。鲁老桅让邻居用板车把他拉到码头来，说今年得来看看。他看见她坐在江边，过去说，虞同志，你等的人到底是谁。她说，一个瘸子。鲁老桅想了想，说，瘸子……我认得一个，姓郗，在附近中学打铃，腿不好，每年这天都来江边坐着。前年不来了，说是死了。她说，哦。鲁老桅说你不问问怎么死的。她说你说。鲁老桅说肺上的病，拖的。她说哦。鲁老桅说，你也是肺上的病。她说嗯。鲁老桅说，你们俩一个病。她没说话。鲁老桅坐了一会儿，说，我年轻时候在码头扛包，见过一个女的，等她男人等了三年，后来她男人回来了，她不认了。她说为什么。鲁老桅说，等太久了，忘了长什么样了。她说我没忘。鲁老桅说我看你也没忘。他让邻居把他拉回去了。第二天她托人去查，查到闸北那间阁楼。郗延舟一九七六年冬天死的，遗物里有另一只铁盒。盒里是四十二张船票残片，按年份拿麻绳扎着。一九七五年那张是完整的，四片拼全了，跟一九三四年那张一模一样。每找到一片，他就在背面的纸上记一笔，记的是年月日，和从哪段泥里找着的。最后一张的背面写着：齐了。铁盒底下压着张纸条——“阿蘅，今年我没去码头。腿走不动了。你刻你的，我刻我的，咱俩的记号，对不上。”她去清理遗物的地方领东西，管事的问她跟死者什么关系。她说朋友。管事的说，朋友不能领，得有亲属证明。她说他没有亲属。管事的说他弟弟呢。她说死了。管事的说那不行，按规定。她站了一会儿，走了。第二天她带了纺织厂的介绍信来，说是生前好友，代领遗物。管事的看了介绍信，又看了看她，说，你签个字吧。她签了。管事的把铁盒推给她，说，就这个，别的东西都处理了。她抱着铁盒走出来，在门口站了一会儿，回头问，他埋在哪儿。管事的翻了翻本子，说，龙华，七区，没碑。她把两只铁盒并排搁在桌上，一只装着半张船票和裁纸刀，一只装着四十二张残片和四十二行字。她看了很久，然后把两只盒子摞在一起，搁进柜子。第二年清明她去龙华，在七区找了半天，没找着。问看墓的，看墓的说没碑的找不着，都平了。她蹲在七区边上，把铁盒打开，拿了一张船票残片，埋在土里。埋完了站起来，走了。</p>
+
+  <p>一九七九年春虞蘅死了。死的时候宿舍里没别人，第二天同事来叫她上班才发现。遗物里有半张船票和那只铁皮盒子，盒里是把裁纸刀，刀柄缠着线，线头断过又接上，接了十七次。殡仪馆的人问鲁老桅，这些烧不烧。鲁老桅说，搁着吧。搁哪儿？就搁那儿。鲁老桅把两只铁盒收在一块儿，搁在殡仪馆的寄存架上，跟骨灰盒并排。登记的人问写谁的名字。鲁老桅说写两个人，一个叫虞蘅，一个叫郗延舟。登记的人说只能写一个。鲁老桅说那就写虞蘅。登记的人写了。鲁老桅看了看，说把郗延舟也写上吧，括号里。登记的人看了他一眼，说，大爷，括号里不写名，写名不规范。鲁老桅说那你看着办。登记的人想了想，写了虞蘅，底下拿小字添了个“郗某”。鲁老桅看了看，没再说话。</p>
+
+  <p>出殡那天送葬的人经过江边新码头。铁栏杆早拆了，换成了不锈钢的，亮得晃眼。有人指着旁边一根旧电线杆说，你们看，这上头有红漆画的杠杠，一道一道，跟刻度尺似的。鲁老桅让邻居用板车把他拉来，他坐在板车上，看了一眼，说，别动。那是有人在这里，刻了一辈子舟。旁边人问什么意思。鲁老桅说不出来，摆摆手。旁边一个年轻人说，大爷，这杆子下礼拜也要拔了。鲁老桅说拔就拔吧。年轻人说拔了这漆就没了。鲁老桅说没了就没了。年轻人说那你还说别动。鲁老桅说我说别动是现在别动，下礼拜拔我管不着。年轻人笑了一声，走了。鲁老桅让邻居把他拉回去，走到半路忽然停下，说回去看看那根杆子。邻居说你不是看过了吗。他说再看一眼。回去看了，红漆杠杠还在。他从口袋里摸出根粉笔，在杠杠底下画了一道，画得很短。画完他让邻居拉他走了。</p>
+
+  <p>没人接话。江风从下游吹上来，煤烟没了，咸腥还在。送葬的人走到江边就散了，各自坐车回家。鲁老桅没坐车，让邻居拉着板车送他回去的。走到半路他想起一件事：虞蘅的铁盒里那把裁纸刀，刀柄上缠的线断了十七次，每次接的时候都打了个结，十七个结从刀柄这头排到那头。他数过的，数完之后把刀放回盒子里，盒子盖好。当时他没多想。后来有一年冬天他躺在床上，忽然想起那些结，想起十七个结里每一个都是一年，一年一道记号，一道记号一个结。他翻了个身，觉得胸口有点闷，没再想。</p>
+
+  <p>后来鲁老桅也死了。死之前他把两只铁盒从殡仪馆取回来，搁在自己家柜子里。他死之后房子被单位收了，柜子里的东西被清理出来，两只铁盒混在杂物堆里。清理的人打开看了一眼，一只里头是半张碎纸和一把缠线的刀，另一只里头是一堆碎纸片。一个人把刀拿出来看了看，说这刀还能用。另一个人说这纸片是什么。头一个人说废纸。他们把铁盒扔进废品堆，刀被人捡走了，碎纸片被风吹散了几片，剩下的连盒带纸进了垃圾场。码头换了不知道第几拨人，旧电线杆在八十年代末的某次清理中拔掉了。红漆杠杠跟着进了垃圾场。没人在意。有个人每年十月十七还去江边坐坐，坐在新客运站的候船大厅里，坐一下午。她不刻记号。有一次她在路边护栏柱上拿红漆笔画了一道，画完看了两秒，走了。没画第二道。那个人的名字没写在任何地方。她住在码头附近，在客运站做清洁工，每天擦候船大厅的长椅。十月十七这天她跟人换班，换到下午，坐在自己刚擦过的长椅上，看进港的船靠岸、上人、开走。有一班船从汉口方向来，她多看了一会儿。船上的乘客走完了，她站起来，把椅子又擦了一遍。</p>
+
+  <p>她也再没去看过。</p>
+
+  <p class="divider">· · · 番外 · 余渡 · · ·</p>
+
+  <p>虞蘅死后第三年，鲁老桅也死了。死前把两只铁盒从殡仪馆取回来，搁在自家柜子里。他死后房子被单位收了，柜子里的东西清理出来，铁盒混在杂物堆里，一只里头是半张碎纸和一把缠线的刀，另一只里头是一堆碎纸片。清理的人把刀拿出来看了看，说这刀还能用，揣兜里了。碎纸片被风吹散了几片，剩下的连盒带纸进了垃圾场。</p>
+
+  <p>码头换了不知道第几拨人。旧电线杆在八十年代末的某次清理中拔掉了，红漆杠杠跟着进了垃圾场。没人在意。</p>
+
+  <p>郗念蘅那年十四岁，替叔公收拾遗物时见过那两只铁盒。她没拿。她爹郗阿七说，那是你叔公的东西，别动。她就没动。后来房子收了，东西清出来，她去看了一眼，铁盒已经没了，地上剩几片碎纸，她捡起来看了看，是船票的边角，蓝墨水印的“江安”两个字还剩半个。她把那几片纸塞进口袋，回家搁在抽屉里，没再看过。</p>
+
+  <p>一九八〇年她进码头做统计员。新码头全是集装箱，龙门吊。没人知道水泥墩上那些红漆杠杠是什么意思，扩建时要铲掉，她去找领导说能不能留着，算文物。领导笑她，几道漆杠子算啥文物。她没再争。铲的那天她请了半天假，没去看。回来时水泥墩已经平了，上面画了新的停车线。她蹲下来摸了摸，水泥是凉的。</p>
+
+  <p>她不攒钱，不谈恋爱，不规划明年。发了工资先买两斤糖炒栗子吃完，剩下的够交房租就行。同事给她介绍对象，她去见，对方问她有什么爱好，她说没有。对方再问那你平时干什么，她说等下班。人家不联系她了，她也不失落。有人问她为什么不结婚。她说我叔公等了一辈子，我叔婆等了一辈子，两个人加一起等了八十年，最后连个并排的坟都没有。我干嘛要等。</p>
+
+  <p>每年十月十七，她去江边坐一下午。不带花，不烧纸。有人问她在等谁，她说不等谁，坐坐。每年清明，她去两个地方。先去郗延舟的坟，拔草，放一包烟。再去虞蘅的骨灰存放处，放一包糖炒栗子。两个地方离得远，她坐公交倒两趟，一天跑完。跑完回家，煮碗面，吃完睡觉。</p>
+
+  <p>一九八五年，码头旁边要建新客运站。她去看规划图，发现新站选址正好压在当年江安号停靠的位置上。她站在工地围栏外抽了根烟。旁边一个老工人问她看什么。她说以前这儿有个码头。老工人说哪个码头，这儿码头多了。她说第三根桩。老工人想了想，第三根桩，早没了。她把烟掐了，走了。</p>
+
+  <p>回家打开柜子，两只铁盒还在。她把两只盒子并排放在桌上，看了很久。然后锁进柜子，钥匙扔进抽屉最里面。没扔，也没再打开。</p>
+
+  <p>客运站建好后，她在候船大厅做清洁工。每天擦长椅，擦玻璃，擦完了坐一会儿，看船靠岸、上人、开走。有一年十月十七她跟人换班，换到下午，坐在自己刚擦过的长椅上，看一班从汉口方向来的船靠岸。乘客走完了，她站起来，把椅子又擦了一遍。</p>
+
+  <p>下班路过一根护栏柱，她从口袋里摸出一支红漆笔，在柱子上画了一道。画完看了两秒，把笔揣回口袋，走了。没画第二道。也没再来看过。</p>
+
+  <p>清理垃圾的老头姓苏，叫苏文，五十来岁，瘦，背有点驼，每天推个板车在码头一带收废品。那天他从垃圾堆里翻出根旧护栏柱，上头有道红漆杠，漆皮翘起来了。他拿指甲抠了抠，抠不掉，就没管，把柱子扔上车拉走了。拉到废品站，过磅，卸货，拿钱，回家。</p>
+
+  <p>苏文以前是写东西的。年轻时在杂志上发表过几篇小说，后来杂志倒了，他也就没再写。有人问他怎么不写了，他说写不动了。再问，他说写了也没人看。后来不问了。他现在收废品，一天挣个十块八块，够吃饭就行。不攒钱，不买房，不结婚——结过，离了，孩子跟女方，一年见一回。见着了他也不问学习，不问工作，就问吃饭没有。孩子说吃了。他说那就好。</p>
+
+  <p>他收废品有个习惯，看见带字的纸就抽出来看一眼。有一回他翻到几页旧信纸，上头写着一首没写完的诗，什么“江风吹过第三根桩”，底下涂了又改，改了又涂，最后一句划掉了，看不清写的什么。他把那几页纸看了半天，折起来揣兜里，回家搁在桌上。第二天又拿出来看了一遍，拿笔在底下添了一句：写诗有什么用。添完了自己笑了一声，把纸揉成团扔了。</p>
+
+  <p>他前妻有一回来码头找他，说孩子要交学费。他从兜里掏出一把零钱，数了数，不够。前妻说你就这么过一辈子。他说能过一天是一天。前妻说你就没点打算。他说打算什么。前妻说你就不能找点正经事做。他说收废品不正经吗。前妻把钱拿走了，没再说话。</p>
+
+  <p>那天晚上他回家，煮了碗面，吃完坐在门口抽烟。抽完了进屋，从抽屉里翻出那团揉皱的纸，展开来看了看，又揉回去扔了。第二天照常推板车出门收废品。</p>
+
+  <p>他后来听说码头边上有根护栏柱上画过一道红漆杠，画杠的人是个清洁工，年年十月十七来江边坐坐。他想了想，好像见过那个人，瘦，话少，跟他一样不攒钱不结婚。他想过去问问她画那杠什么意思。走到半路又拐回来了。问什么呢。他自己收废品，看见带字的纸就抽出来看一眼，看完了揉成团扔了。她画一道杠，他看一眼纸，差不多。</p>
+
+  <p>再后来那清洁工也不来了。苏文照常收他的废品。有一回他翻到一张旧船票的残片，蓝墨水印的，字看不清了，就剩个“江”字。他看了两秒，揣兜里，回家搁在桌上。第二天拿出来看了看，扔进炉子里烧了。烧完他坐了一会儿，出门收废品去了。</p>
+
+  <button class="back" id="backBtn">返 回 开 始</button>
+</div>
+
+<script>
+/* =========================================================
+   第三根桩 · 互动原型（含启动页 / 跳过 / 正文阅读 / 音乐 / 进度）
+   ========================================================= */
+
+const introEl   = document.getElementById("intro");
+const gameEl    = document.getElementById("game");
+const readerEl  = document.getElementById("reader");
+const skipBtn   = document.getElementById("skipBtn");
+const enterBtn  = document.getElementById("enterBtn");
+const backBtn   = document.getElementById("backBtn");
+
+const state = {
+  year: 1934,
+  turnIndex: 0,
+  marks: [],
+  depth: 0,
+  memory: 100,
+  tool: "裁纸刀",
+  pileType: "木桩",
+  pileChangedYear: null,
+  seenBox: false,
+  log: [],
+  ended: false,
+  line: "yu",          
+  xiMarks: [],
+  xiTurn: 0
+};
+
+const PILE_TIMELINE = [
+  {from:1934, type:"木桩"},
+  {from:1953, type:"水泥桩"},
+  {from:1976, type:"铁栏杆"},
+  {from:1980, type:"旧电线杆"},
+  {from:1989, type:"拔掉"}
+];
+
+const TOOLS = {
+  "木桩": ["裁纸刀"],
+  "水泥桩": ["锥子"],
+  "铁栏杆": ["红漆笔"],
+  "旧电线杆": ["红漆笔","粉笔"],
+  "拔掉": []
+};
+
+function pileForYear(y){
+  let t = "木桩";
+  for(const p of PILE_TIMELINE){ if(y >= p.from) t = p.type; }
+  return t;
+}
+
+function setYear(y){
+  state.year = y;
+  const newType = pileForYear(y);
+  if(newType !== state.pileType){
+    state.pileType = newType;
+    state.pileChangedYear = y;
+    state.log.push(`【${y}年】桩/栏变了：${newType}。`);
+  }
+}
+
+function availableTools(){
+  return TOOLS[state.pileType] || [];
+}
+
+function addMark(tool, posNote){
+  state.marks.push({year:state.year, tool, pos:state.marks.length});
+  const gain = tool === "裁纸刀" ? 3 : tool === "锥子" ? 2 : 1;
+  state.depth += gain;
+  state.memory = Math.min(100, state.memory + 2);
+  state.log.push(`【${state.year}年】在${state.pileType}上刻了一道（${tool}）。${posNote||""}`);
+}
+
+function decayMemory(){
+  state.memory = Math.max(0, state.memory - 4);
+}
+
+function showIntro(){
+  introEl.style.display = "block";
+  gameEl.style.display = "none";
+  readerEl.style.display = "none";
+  skipBtn.style.display = "none";
+}
+
+function showGame(){
+  introEl.style.display = "none";
+  gameEl.style.display = "block";
+  readerEl.style.display = "none";
+  skipBtn.style.display = "block";
+  skipBtn.textContent = "跳过互动 · 直接阅读正文";
+  resetGame();
+  render();
+}
+
+function showReader(){
+  introEl.style.display = "none";
+  gameEl.style.display = "none";
+  readerEl.style.display = "block";
+  skipBtn.style.display = "block";
+  skipBtn.textContent = "返 回 开 始";
+  readerEl.scrollTop = 0;
+  checkProgress(); // 检查阅读进度
+}
+
+function resetGame(){
+  state.year = 1934;
+  state.turnIndex = 0;
+  state.marks = [];
+  state.depth = 0;
+  state.memory = 100;
+  state.tool = "裁纸刀";
+  state.pileType = "木桩";
+  state.pileChangedYear = null;
+  state.seenBox = false;
+  state.log = [];
+  state.ended = false;
+  state.line = "yu";
+  state.xiMarks = [];
+  state.xiTurn = 0;
+  setYear(1934);
+}
+
+const stageEl   = document.getElementById("stage");
+const marksEl   = document.getElementById("marks");
+const choicesEl = document.getElementById("choices");
+const statusEl  = document.getElementById("status");
+const turnEl    = document.getElementById("turn");
+const logEl     = document.getElementById("log");
+
+function render(){
+  let text = "";
+  if(state.line === "yu"){
+    text += `<span class="year">民国${state.year-1911}年 · 十月十七</span>\n`;
+    if(state.turnIndex === 0){
+      text += `码头第三根桩。江风从下游吹上来，带着煤烟和咸腥。\n你手里攥着一包糖炒栗子，还热着。`;
+    } else if(state.pileType === "拔掉"){
+      text += `码头已经变了样。第三根桩早没了，铁栏杆也拆了，只剩一根旧电线杆。\n你站在江边，风还是那个风。`;
+    } else {
+      text += `码头第三根桩——现在是${state.pileType}的了。\n你站在老位置，手袋里有${state.tool}。`;
+    }
+    if(state.pileChangedYear === state.year){
+      text += `\n<span class="hl">桩换了。旧痕不知拉去了哪里。</span>`;
+    }
+    if(state.memory < 40){
+      text += `\n<span class="hl">你有点记不清他的脸了。</span>`;
+    }
+  } else {
+    text += `<span class="year">郗延舟线 · 第${state.xiTurn+1}年</span>\n`;
+    text += `你瘸着腿，远远站在货栈墙根底下。\n桩那边有个月白的影子。你手里有一把伞，没撑开。`;
+  }
+  stageEl.innerHTML = text;
+
+  if(state.marks.length === 0){
+    marksEl.innerHTML = `<span style="opacity:.5">还没有记号。</span>`;
+  } else {
+    marksEl.innerHTML = state.marks.map((m,i)=>{
+      const sym = m.tool === "裁纸刀" ? "｜" : m.tool === "锥子" ? "┃" : m.tool === "粉笔" ? "╎" : "▏";
+      return `<span class="m" title="${m.year}年 ${m.tool}">${sym}</span>`;
+    }).join("") + `<span style="opacity:.5;margin-left:8px">共${state.marks.length}道 · 深度${state.depth}</span>`;
+  }
+
+  choicesEl.innerHTML = "";
+  if(state.ended){
+    addBtn("重新开始互动", ()=>{ resetGame(); render(); });
+    addBtn("直接阅读正文", showReader);
+  } else if(state.line === "yu"){
+    const tools = availableTools();
+    if(tools.length === 0){
+      addBtn("桩没了。站一会儿，走。", ()=>nextYear(false));
+    } else {
+      for(const t of tools){
+        addBtn(`用${t}刻一道`, ()=>{
+          state.tool = t;
+          addMark(t, state.pileType==="水泥桩"?"凿了半个钟头，虎口旧伤又裂了。":"");
+          nextYear(true);
+        });
+      }
+      addBtn("今年不刻，站一会儿就走", ()=>nextYear(false));
+    }
+    if(state.year >= 1956 && !state.seenBox){
+      addBtn("去闸北找他", ()=>{
+        state.seenBox = true;
+        stageEl.innerHTML += `\n\n你去了闸北。邻居说他搬走了，留了个铁盒给你。\n铁盒里是一张拼起来的船票，背面铅笔写着：\n<span class="hl">“我来了，没失约。腿断了，爬到的。”</span>\n\n你回码头，在桩上又刻了一道。`;
+        addMark("锥子","");
+        choicesEl.innerHTML = "";
+        setTimeout(()=>nextYear(true), 1400);
+      });
+    }
+  } else {
+    addBtn("远远看着，不撑伞", ()=>{
+      state.xiMarks.push({year:1934+state.xiTurn, note:"远远看"});
+      state.xiTurn++;
+      if(state.xiTurn >= 3){
+        state.line = "yu";
+        state.log.push("【郗延舟线】他每年都来，远远看。你永远不知道。");
+        render();
+        return;
+      }
+      render();
+    });
+    addBtn("撑开伞，往前走几步，又退回去", ()=>{
+      state.xiMarks.push({year:1934+state.xiTurn, note:"撑伞又收"});
+      state.xiTurn++;
+      if(state.xiTurn >= 3){
+        state.line = "yu";
+        state.log.push("【郗延舟线】有一年下雨，你把伞撑开又收回去。她看见了。");
+        render();
+        return;
+      }
+      render();
+    });
+  }
+
+  statusEl.textContent = `工具：${state.tool} · 记忆：${state.memory}`;
+  turnEl.textContent = state.line === "yu" ? `第${state.turnIndex+1}年` : `郗线第${state.xiTurn+1}年`;
+  logEl.innerHTML = state.log.slice(-8).map(l=>`<p>${l}</p>`).join("");
+}
+
+function addBtn(label, fn){
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.onclick = fn;
+  choicesEl.appendChild(b);
+}
+
+function nextYear(advanced){
+  state.turnIndex++;
+  if(!advanced) decayMemory();
+
+  const jump = state.turnIndex < 10 ? 1 : state.turnIndex < 20 ? 3 : 5;
+  let y = state.year + jump;
+  if(y > 1989) y = 1989;
+  setYear(y);
+
+  if(state.line === "yu" && state.turnIndex === 6){
+    state.line = "xi";
+    state.log.push("【切换视角】货栈墙根底下，有个人远远站着。");
+    render();
+    return;
+  }
+
+  if(state.year >= 1989){
+    endGame();
+    return;
+  }
+  render();
+}
+
+function endGame(){
+  state.ended = true;
+  let endText = "";
+  if(state.marks.length === 0){
+    endText = `你一道记号也没刻。\n风把桩上的旧痕磨平了。没人记得这里站过谁。`;
+  } else {
+    endText = `你刻了${state.marks.length}道记号。\n桩换了又换，记号凿了又凿。\n\n后来有人问：刻给谁看？\n你说：刻给自己看。\n\n<span class="hl">咱俩的记号，对不上。</span>`;
+  }
+  stageEl.innerHTML = `<span class="year">结局</span>\n\n` + endText;
+  choicesEl.innerHTML = "";
+  addBtn("重新开始互动", ()=>{ resetGame(); render(); });
+  addBtn("直接阅读正文", showReader);
+  statusEl.textContent = "";
+  turnEl.textContent = "完";
+  logEl.innerHTML = state.log.slice(-10).map(l=>`<p>${l}</p>`).join("");
+
+  setTimeout(()=>{
+    if(state.ended){ showReader(); }
+  }, 2200);
+}
+
+enterBtn.addEventListener("click", showGame);
+
+skipBtn.addEventListener("click", ()=>{
+  if(readerEl.style.display === "block"){
+    showIntro();
+  } else {
+    showReader();
+  }
+});
+
+backBtn.addEventListener("click", showIntro);
+
+/* ================= 音乐控制 ================= */
+let isPlaying = false;
+const audio = document.getElementById('bg-music');
+const icon = document.getElementById('music-icon');
+const player = document.getElementById('music-player');
+
+function toggleMusic() {
+    if (isPlaying) {
+        audio.pause();
+        icon.innerText = '🎵';
+        player.classList.remove('playing');
+    } else {
+        audio.play();
+        icon.innerText = '⏸';
+        player.classList.add('playing');
+    }
+    isPlaying = !isPlaying;
+}
+
+/* ================= 阅读进度记忆 ================= */
+const readerContainer = document.getElementById('reader');
+
+// 监听正文区域的滚动，实时保存
+readerContainer.addEventListener('scroll', function() {
+    if (readerEl.style.display === 'block') {
+        const currentScroll = readerContainer.scrollTop;
+        // 只有读了一定高度才保存，防止误触
+        if (currentScroll > 100) {
+            localStorage.setItem('scroll_story6', currentScroll);
+        }
+    }
+});
+
+function checkProgress() {
+    const savedScroll = localStorage.getItem('scroll_story6');
+    if (savedScroll) {
+        setTimeout(() => {
+            readerContainer.scrollTo({ top: parseInt(savedScroll), behavior: 'smooth' });
+        }, 300); // 等页面渲染完再滚动
+    }
+}
+
+/* 启动 */
+showIntro();
+</script>
+</body>
+  </html>
