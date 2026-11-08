@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>躲避弹幕移动端</title>
+<title>躲避恶意弹幕</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;background:#050508;overflow:hidden;
@@ -42,9 +42,9 @@
   .btn{width:76px;height:76px;border-radius:50%;
     border:2px solid rgba(255,255,255,0.35);
     background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), rgba(40,40,60,0.6));
-    color:#fff;font-size:15px;font-family:"Courier New",monospace;font-weight:bold;
+    color:#fff;font-size:14px;font-family:"Courier New",monospace;font-weight:bold;
     display:flex;justify-content:center;align-items:center;
-    touch-action:none;cursor:pointer;letter-spacing:1px;
+    touch-action:manipulation;cursor:pointer;letter-spacing:1px;
     box-shadow:0 0 12px rgba(255,255,255,0.08), inset 0 -3px 6px rgba(0,0,0,0.3);
     transition:transform 0.08s, box-shadow 0.08s, background 0.08s;}
   .btn:active{transform:scale(0.92);
@@ -53,21 +53,29 @@
   .btn.small{width:58px;height:58px;font-size:12px;}
   .btn-row{display:flex;gap:14px;justify-content:flex-end;}
 
-  @media (orientation: portrait){
-    #controls, #game-wrap{display:none;}
-  }
+  @media (orientation: portrait){ #controls, #game-wrap{display:none;} }
+
+  /* 覆盖层 */
+  .overlay{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;text-align:center;padding:24px;
+    background:radial-gradient(ellipse at bottom,#14101a,#050508);
+    transition:opacity .5s;pointer-events:auto;touch-action:manipulation;}
+  .overlay.hide{opacity:0;pointer-events:none;}
+  .overlay h1{font-size:26px;color:#ffb3d7;text-shadow:0 0 16px #ff85b9;margin-bottom:12px;letter-spacing:2px;}
+  .overlay p{font-size:14px;color:#aab;line-height:1.9;max-width:560px;margin-bottom:24px;white-space:pre-line;}
+  .overlay .warn{color:#ff8a9a;font-size:13px;max-width:560px;margin-bottom:24px;line-height:1.8;}
+  .overlay button{padding:14px 36px;background:linear-gradient(90deg,#ff85b9,#ffb3d7);
+    color:#fff;border:none;border-radius:10px;font-size:16px;font-family:inherit;
+    cursor:pointer;box-shadow:0 0 18px rgba(255,179,215,0.4);letter-spacing:2px;
+    pointer-events:auto;touch-action:manipulation;}
+  .overlay button:active{transform:scale(.96);}
 </style>
 </head>
 <body>
 
-<div id="rotate">
-  <div class="icon">📱</div>
-  请将手机横屏<br>以获得最佳游戏体验
-</div>
+<div id="rotate"><div class="icon">📱</div>请将手机横屏<br>以获得最佳游戏体验</div>
 
-<div id="game-wrap">
-  <canvas id="game" width="800" height="450"></canvas>
-</div>
+<div id="game-wrap"><canvas id="game" width="800" height="450"></canvas></div>
 
 <div id="controls">
   <div id="joystick"><div id="stick"></div></div>
@@ -78,9 +86,49 @@
     </div>
     <div class="btn-row">
       <div class="btn" id="btnAct">行动</div>
-      <div class="btn" id="btnMercy">仁慈</div>
+      <div class="btn" id="btnMercy">跳过</div>
     </div>
   </div>
+</div>
+
+<!-- 开始 -->
+<div class="overlay" id="startUI">
+  <h1>躲避恶意弹幕</h1>
+  <p>你是一名正在赶 Deadline 的开发者。
+敌人是不断弹出的 Bug、需求和线上告警。
+撑过三个阶段，别让心智值归零。</p>
+  <div class="warn">
+    本作反对一切形式的恶意弹幕、人身攻击与网络暴力。
+    游戏中的“恶意弹幕”仅指代码缺陷与线上告警，
+    不指向任何真实个人。请文明交流，拒绝恶意刷屏。
+  </div>
+  <button id="startBtn">开始调试</button>
+</div>
+
+<!-- 阶段过渡 -->
+<div class="overlay hide" id="retryUI">
+  <h1 id="retryTitle">阶段结束</h1>
+  <p id="retryText"></p>
+  <div class="warn">拒绝恶意弹幕，从每一次文明发言开始。</div>
+  <button id="retryBtn">进入下一阶段</button>
+</div>
+
+<!-- 失败 -->
+<div class="overlay hide" id="failUI">
+  <h1 style="color:#ff4466;text-shadow:0 0 20px #ff4466;">GAME OVER</h1>
+  <p id="failText">心智值归零。你被恶意弹幕压垮了。</p>
+  <div class="warn">恶意弹幕不会解决问题，只会制造更多问题。</div>
+  <button id="failBtn">重新开始</button>
+</div>
+
+<!-- 通关 -->
+<div class="overlay hide" id="winUI">
+  <h1>上线成功</h1>
+  <p>你撑过了所有阶段。
+Bug 还在，需求还在，但今天你活下来了。
+明天继续。</p>
+  <div class="warn">愿每一次交流都不带恶意，愿每一条弹幕都不伤人。</div>
+  <button id="winBtn">再来一次</button>
 </div>
 
 <script>
@@ -101,65 +149,53 @@ const player = {
 };
 
 let state = 'menu';
+let stage = 0;
 let turnCount = 0;
-let bullets = [];
-let particles = [];
-let stars = [];
-let spawnTimer = 0;
-let patternIndex = 0;
-let battleTimer = 0;
-const BATTLE_FRAMES = 420;
-let message = '按「行动」开始';
-let typedMessage = '';
-let typingTimer = 0;
-let resultText = '';
-let shake = 0;
-let fade = 1;
-let currentMenu = 0;
-let enemyShake = 0;
-let enemyBreath = 0;
-let talkPoints = 0;
-const TALK_NEEDED = 3;
-let mercyReady = false;
-let outcome = '';
-let hitStop = 0;
+let bullets = [], particles = [], stars = [], pickups = [];
+let spawnTimer = 0, pickupTimer = 0;
+let patternIndex = 0, battleTimer = 0, BATTLE_FRAMES = 420;
+let message = '按「行动」开始', typedMessage = '', typingTimer = 0;
+let shake = 0, fade = 1, enemyShake = 0, enemyBreath = 0, hitStop = 0;
+let score = 0, hurtCount = 0, maxHurt = 8, difficulty = 1;
+let patternTick = 0;
+
+const devWords = ['本地是好的','先上线再说','这是特性不是 Bug','下周一定','就改一行代码','回滚吧','再给我十分钟','文档后面补','先 mock 一下','线上再观察'];
+let usedWords = [];
+function getDevWord(){
+  if (usedWords.length >= devWords.length) usedWords = [];
+  let idx; do { idx = Math.floor(Math.random()*devWords.length); } while (usedWords.includes(idx));
+  usedWords.push(idx); return devWords[idx];
+}
 
 // 音效
 let audioCtx = null;
 function ensureAudio(){
-  if (!audioCtx){
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
-  }
+  if (!audioCtx){ try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 }
 function beep(freq, dur, type='square', vol=0.06, slide=0){
-  ensureAudio();
-  if (!audioCtx) return;
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type = type;
-  o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  ensureAudio(); if (!audioCtx) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
   if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq+slide), audioCtx.currentTime + dur);
   g.gain.setValueAtTime(vol, audioCtx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(); o.stop(audioCtx.currentTime + dur);
+  o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
 }
-function sfxConfirm(){ beep(660, 0.08, 'square', 0.05); setTimeout(()=>beep(880,0.08,'square',0.05), 60); }
-function sfxHit(){ beep(140, 0.18, 'sawtooth', 0.09, -60); }
-function sfxTimeStop(){ beep(300, 0.3, 'sine', 0.07, 400); }
-function sfxMercy(){ beep(523,0.12,'sine',0.06); setTimeout(()=>beep(659,0.12,'sine',0.06),100); setTimeout(()=>beep(784,0.2,'sine',0.06),200); }
-function sfxStart(){ beep(220,0.1,'square',0.05); setTimeout(()=>beep(330,0.1,'square',0.05),80); }
+const sfx = {
+  confirm:()=>{beep(660,0.08);setTimeout(()=>beep(880,0.08),60);},
+  hit:()=>beep(140,0.18,'sawtooth',0.09,-60),
+  timeStop:()=>beep(300,0.3,'sine',0.07,400),
+  start:()=>{beep(220,0.1);setTimeout(()=>beep(330,0.1),80);},
+  pickup:()=>beep(880,0.08,'sine',0.05)
+};
 
-// 星点背景
-for (let i=0;i<60;i++){
-  stars.push({x:Math.random()*W, y:Math.random()*H, s:Math.random()*1.5+0.5, sp:Math.random()*0.3+0.1});
-}
+for (let i=0;i<60;i++) stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.5+0.5,sp:Math.random()*0.3+0.1});
 
+// 键盘
 const keys = {};
 window.addEventListener('keydown', e => {
-  const k = e.key.toLowerCase();
-  keys[k] = true;
+  const k = e.key.toLowerCase(); keys[k] = true;
   if (e.key.startsWith('Arrow')) e.preventDefault();
   handleAction(k);
 });
@@ -167,61 +203,43 @@ window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
 function handleAction(k){
   ensureAudio();
-  if (state === 'menu' && (k === 'z' || k === 'x')) { state = 'choose'; currentMenu = 0; setMessage('选择你的行动。'); box = { ...boxNormal }; fade = 0.6; sfxConfirm(); }
-  else if (state === 'choose'){
-    if (k === 'arrowleft' || k === 'arrowright' || k === 'a' || k === 'd'){ currentMenu = currentMenu === 0 ? 1 : 0; sfxConfirm(); }
-    if (k === 'z') confirmChoose();
-  }
+  if (state === 'menu' && (k === 'z' || k === 'x')) startBattle();
   else if (state === 'battle' && k === 'c') tryTimeStop();
-  else if (state === 'result' && k === 'r') resetGame();
 }
 
+// 按钮绑定：touchstart + click 双保险
 function bindBtn(id, action){
   const el = document.getElementById(id);
-  el.addEventListener('touchstart', e => { e.preventDefault(); ensureAudio(); action(); }, {passive:false});
-  el.addEventListener('mousedown', e => { e.preventDefault(); ensureAudio(); action(); });
-}
-bindBtn('btnAct', () => { if (state === 'menu' || state === 'choose') doAct(); });
-bindBtn('btnMercy', () => { if (state === 'menu' || state === 'choose') doMercy(); });
-bindBtn('btnC', () => tryTimeStop());
-bindBtn('btnR', () => resetGame());
-
-function setMessage(m){
-  message = m; typedMessage = ''; typingTimer = 0;
+  if (!el) return;
+  const fn = (e) => { e.preventDefault(); e.stopPropagation(); ensureAudio(); action(); };
+  el.addEventListener('touchstart', fn, {passive:false});
+  el.addEventListener('click', fn);
+  el.addEventListener('mousedown', fn);
 }
 
-function doAct(){
-  talkPoints++;
-  if (talkPoints >= TALK_NEEDED){
-    mercyReady = true;
-    setMessage(`你与敌人交谈。（交涉 ${talkPoints}/${TALK_NEEDED}）敌人动摇了，仁慈已可用。`);
-  } else {
-    setMessage(`你与敌人交谈。（交涉 ${talkPoints}/${TALK_NEEDED}）`);
-  }
-  startBattle();
-}
+// 覆盖层按钮
+bindBtn('startBtn', startGame);
+bindBtn('retryBtn', nextStage);
+bindBtn('failBtn', resetGame);
+bindBtn('winBtn', resetGame);
 
-function doMercy(){
-  if (mercyReady || talkPoints >= TALK_NEEDED){
-    state = 'result'; outcome = 'mercy';
-    resultText = '你宽恕了敌人。战斗和平结束。';
-    fade = 1; box = { ...boxNormal }; sfxMercy();
-    for (let i=0;i<40;i++) spawnParticle(box.x+box.w/2, box.y+box.h/2, '#7dffa0');
-    return;
-  }
-  setMessage('敌人还不愿意听你的…弹幕来袭！');
-  startBattle();
-}
+// 控制按钮
+bindBtn('btnAct', () => { if (state === 'menu') startBattle(); });
+bindBtn('btnMercy', () => { if (state === 'battle') tryEndStage(); });
+bindBtn('btnC', tryTimeStop);
+bindBtn('btnR', resetGame);
 
-function confirmChoose(){
-  sfxConfirm();
-  if (currentMenu === 0) doAct();
-  else doMercy();
+function setMessage(m){ message = m; typedMessage = ''; typingTimer = 0; }
+
+function tryEndStage(){
+  if (state !== 'battle') return;
+  score = Math.max(0, score - 5);
+  endBattle(true, true);
 }
 
 function tryTimeStop(){
   if (state === 'battle' && player.focus >= player.maxFocus){
-    player.frozen = 90; player.focus = 0; player.glow = 30; sfxTimeStop();
+    player.frozen = 90; player.focus = 0; player.glow = 30; sfx.timeStop();
     for (let i=0;i<20;i++) spawnParticle(player.x, player.y, '#8cf');
   }
 }
@@ -229,98 +247,125 @@ function tryTimeStop(){
 // 摇杆
 const joystick = document.getElementById('joystick');
 const stick = document.getElementById('stick');
-let joyActive = false;
-let joyVec = { x: 0, y: 0 };
+let joyActive = false, joyVec = { x: 0, y: 0 };
 const joyRadius = 55;
 function getJoyCenter(){ const r = joystick.getBoundingClientRect(); return { x: r.left + r.width/2, y: r.top + r.height/2 }; }
-function updateJoy(clientX, clientY){
-  const c = getJoyCenter(); let dx = clientX - c.x, dy = clientY - c.y;
+function updateJoy(cx, cy){
+  const c = getJoyCenter(); let dx = cx - c.x, dy = cy - c.y;
   const dist = Math.hypot(dx, dy);
-  if (dist > joyRadius){ dx = dx / dist * joyRadius; dy = dy / dist * joyRadius; }
-  stick.style.left = (43 + dx) + 'px'; stick.style.top = (43 + dy) + 'px';
-  joyVec.x = dx / joyRadius; joyVec.y = dy / joyRadius;
-  if (Math.hypot(joyVec.x, joyVec.y) < 0.15) { joyVec.x = 0; joyVec.y = 0; }
+  if (dist > joyRadius){ dx = dx/dist*joyRadius; dy = dy/dist*joyRadius; }
+  stick.style.left = (43+dx)+'px'; stick.style.top = (43+dy)+'px';
+  joyVec.x = dx/joyRadius; joyVec.y = dy/joyRadius;
+  if (Math.hypot(joyVec.x, joyVec.y) < 0.15){ joyVec.x = 0; joyVec.y = 0; }
 }
-function resetJoy(){ joyActive = false; joyVec.x = 0; joyVec.y = 0; stick.style.left = '43px'; stick.style.top = '43px'; joystick.classList.remove('active'); }
+function resetJoy(){ joyActive = false; joyVec.x = 0; joyVec.y = 0; stick.style.left='43px'; stick.style.top='43px'; joystick.classList.remove('active'); }
 joystick.addEventListener('touchstart', e => { e.preventDefault(); ensureAudio(); joyActive = true; joystick.classList.add('active'); updateJoy(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
 joystick.addEventListener('touchmove', e => { e.preventDefault(); if (!joyActive) return; updateJoy(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
 joystick.addEventListener('touchend', e => { e.preventDefault(); resetJoy(); }, {passive:false});
-joystick.addEventListener('touchcancel', () => resetJoy());
+joystick.addEventListener('touchcancel', resetJoy);
 joystick.addEventListener('mousedown', e => { e.preventDefault(); joyActive = true; joystick.classList.add('active'); updateJoy(e.clientX, e.clientY); });
 window.addEventListener('mousemove', e => { if (joyActive) updateJoy(e.clientX, e.clientY); });
 window.addEventListener('mouseup', () => { if (joyActive) resetJoy(); });
 
-function spawnParticle(x, y, color){
-  const a = Math.random()*Math.PI*2; const s = 1 + Math.random()*3;
-  particles.push({x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, life:1, color, size:1+Math.random()*3});
+function spawnParticle(x,y,color){
+  const a = Math.random()*Math.PI*2, s = 1+Math.random()*3;
+  particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color,size:1+Math.random()*3});
+}
+
+function hideAllOverlays(){
+  ['startUI','retryUI','failUI','winUI'].forEach(id => document.getElementById(id).classList.add('hide'));
 }
 
 function resetGame(){
+  hideAllOverlays();
+  document.getElementById('startUI').classList.remove('hide');
   player.hp = player.maxHp; player.focus = 0; player.frozen = 0;
   player.hurtFlash = 0; player.glow = 0;
   player.x = boxBattle.x + boxBattle.w/2; player.y = boxBattle.y + boxBattle.h/2;
-  state = 'menu'; turnCount = 0; bullets = []; particles = [];
-  spawnTimer = 0; battleTimer = 0; shake = 0; fade = 1; hitStop = 0;
-  box = { ...boxNormal }; setMessage('按「行动」开始'); resultText = ''; currentMenu = 0;
-  talkPoints = 0; mercyReady = false; outcome = ''; enemyShake = 0;
+  state = 'menu'; stage = 0; turnCount = 0; bullets = []; particles = []; pickups = [];
+  spawnTimer = 0; pickupTimer = 0; battleTimer = 0; shake = 0; fade = 1; hitStop = 0;
+  score = 0; hurtCount = 0; maxHurt = 8; difficulty = 1; usedWords = []; patternTick = 0;
+  box = { ...boxNormal }; setMessage('按「行动」开始');
+}
+
+function startGame(){
+  hideAllOverlays();
+  resetGame();
+  hideAllOverlays();
+  setTimeout(startBattle, 300);
 }
 
 function startBattle(){
-  state = 'battle'; sfxStart();
-  bullets = []; particles = []; spawnTimer = 0; battleTimer = 0;
+  state = 'battle'; sfx.start();
+  bullets = []; particles = []; pickups = []; spawnTimer = 0; pickupTimer = 0; battleTimer = 0;
   turnCount++;
   patternIndex = (turnCount - 1) % 6;
   box = { ...boxBattle };
   player.x = boxBattle.x + boxBattle.w/2; player.y = boxBattle.y + boxBattle.h/2;
   fade = 0.6; enemyShake = 10;
-  setMessage(patternName(patternIndex));
+  setMessage('阶段 ' + (stage+1) + '：' + ['Bug 潮','需求变更','线上告警'][stage] + ' —— 躲避恶意弹幕，收集补丁');
+  BATTLE_FRAMES = 420 + stage * 120;
 }
 
-function patternName(i){
-  return ['弹幕来袭：下落','弹幕来袭：横穿','弹幕来袭：追踪','弹幕来袭：心形','弹幕来袭：环形','弹幕来袭：螺旋'][i] || '弹幕来袭！';
-}
-
-function endBattle(win){
-  if (player.hp <= 0) win = false;
-  state = 'result'; fade = 1;
-  if (win){ outcome = 'win'; resultText = `你撑过了第 ${turnCount} 回合！`; if (player.focus < player.maxFocus) player.focus = Math.min(player.maxFocus, player.focus + 10); }
-  else { outcome = 'lose'; resultText = '你倒下了…'; }
+function endBattle(win, mercy=false){
+  if (!win){
+    state = 'result';
+    document.getElementById('failText').textContent = '心智值归零。你被恶意弹幕压垮了。';
+    document.getElementById('failUI').classList.remove('hide');
+    return;
+  }
+  stage++;
+  if (stage >= 3){
+    state = 'result';
+    document.getElementById('winUI').classList.remove('hide');
+    return;
+  }
+  state = 'menu';
   box = { ...boxNormal };
+  document.getElementById('retryTitle').textContent = mercy ? '已跳过本阶段' : '阶段完成';
+  document.getElementById('retryText').textContent = `当前心智值：${score}\n进入阶段 ${stage+1} 前，喘口气。`;
+  document.getElementById('retryUI').classList.remove('hide');
 }
 
-// 弹幕生成
-let patternTick = 0;
+function nextStage(){
+  document.getElementById('retryUI').classList.add('hide');
+  difficulty += 1; maxHurt = 8 + stage*2; hurtCount = 0;
+  startBattle();
+}
+
+// 弹幕
 function spawnBullet(){
-  const p = patternIndex;
-  patternTick++;
+  const p = patternIndex; patternTick++;
+  const sp = 1 + difficulty * 0.15;
   if (p === 0){
-    bullets.push({x: box.x + Math.random()*box.w, y: box.y-10, vx:0, vy:2.2, r:5, type:'circle', trail:[]});
+    bullets.push({x: box.x + Math.random()*box.w, y: box.y-10, vx:0, vy:2.2*sp, r:5, type:'circle', trail:[]});
   } else if (p === 1){
     const fromLeft = Math.random() < 0.5;
-    bullets.push({x: fromLeft ? box.x-10 : box.x+box.w+10, y: box.y + Math.random()*box.h, vx: fromLeft ? 2.6 : -2.6, vy:0, r:5, type:'circle', trail:[]});
+    bullets.push({x: fromLeft ? box.x-10 : box.x+box.w+10, y: box.y + Math.random()*box.h, vx: (fromLeft?2.6:-2.6)*sp, vy:0, r:5, type:'circle', trail:[]});
   } else if (p === 2){
     const angle = Math.atan2(player.y - (box.y+box.h/2), player.x - (box.x+box.w/2));
-    bullets.push({x: box.x+box.w/2, y: box.y+box.h/2, vx: Math.cos(angle)*1.6, vy: Math.sin(angle)*1.6, r:6, type:'track', trail:[]});
+    bullets.push({x: box.x+box.w/2, y: box.y+box.h/2, vx: Math.cos(angle)*1.6*sp, vy: Math.sin(angle)*1.6*sp, r:6, type:'track', trail:[]});
   } else if (p === 3){
-    // 心形弹幕：从上方按心形参数落点
-    const t = (patternTick % 20) / 20 * Math.PI * 2;
-    const hx = 16 * Math.pow(Math.sin(t), 3);
-    const hy = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
-    bullets.push({x: box.x + box.w/2 + hx*6, y: box.y - 20 + hy*3, vx:0, vy:1.8, r:4, type:'heart', trail:[]});
+    const t = (patternTick % 20)/20 * Math.PI * 2;
+    const hx = 16*Math.pow(Math.sin(t),3);
+    const hy = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    bullets.push({x: box.x + box.w/2 + hx*6, y: box.y - 20 + hy*3, vx:0, vy:1.8*sp, r:4, type:'heart', trail:[]});
   } else if (p === 4){
-    // 环形弹幕
     if (patternTick % 30 === 0){
       const cx = box.x + box.w/2, cy = box.y + box.h/2;
       for (let i=0;i<12;i++){
         const a = i/12 * Math.PI*2;
-        bullets.push({x:cx, y:cy, vx:Math.cos(a)*1.4, vy:Math.sin(a)*1.4, r:4, type:'ring', trail:[]});
+        bullets.push({x:cx,y:cy,vx:Math.cos(a)*1.4*sp,vy:Math.sin(a)*1.4*sp,r:4,type:'ring',trail:[]});
       }
     }
   } else {
-    // 螺旋弹幕
     const a = patternTick * 0.4;
-    bullets.push({x: box.x + box.w/2, y: box.y + box.h/2, vx:Math.cos(a)*1.5, vy:Math.sin(a)*1.5, r:4, type:'spiral', trail:[]});
+    bullets.push({x: box.x + box.w/2, y: box.y + box.h/2, vx:Math.cos(a)*1.5*sp, vy:Math.sin(a)*1.5*sp, r:4, type:'spiral', trail:[]});
   }
+}
+
+function spawnPickup(){
+  pickups.push({x: box.x + 20 + Math.random()*(box.w-40), y: box.y - 10, vy: 1.6, r: 7, word: getDevWord()});
 }
 
 function update(){
@@ -332,17 +377,15 @@ function update(){
   if (hitStop > 0) hitStop--;
   enemyBreath += 0.05;
 
-  // 逐字对话
   if (typedMessage.length < message.length){
     typingTimer++;
-    if (typingTimer % 2 === 0) typedMessage = message.slice(0, typedMessage.length + 1);
+    if (typingTimer % 2 === 0) typedMessage = message.slice(0, typedMessage.length+1);
   }
 
   for (const s of stars){ s.y += s.sp; if (s.y > H){ s.y = 0; s.x = Math.random()*W; } }
 
-  for (let i=particles.length-1; i>=0; i--){
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.life -= 0.03;
+  for (let i=particles.length-1;i>=0;i--){
+    const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.life -= 0.03;
     if (p.life <= 0) particles.splice(i,1);
   }
 
@@ -359,30 +402,38 @@ function update(){
 
   spawnTimer--;
   const slow = player.frozen > 0 ? 0.35 : 1;
-  if (spawnTimer <= 0){ spawnBullet(); spawnTimer = 18 + Math.floor(Math.random()*14); }
+  if (spawnTimer <= 0){ spawnBullet(); spawnTimer = Math.max(10, 22 - difficulty*2) + Math.floor(Math.random()*10); }
 
-  for (let i = bullets.length-1; i >= 0; i--){
+  pickupTimer--;
+  if (pickupTimer <= 0){ spawnPickup(); pickupTimer = 90 + Math.floor(Math.random()*60); }
+
+  for (let i=bullets.length-1;i>=0;i--){
     const b = bullets[i];
-    b.x += b.vx * slow; b.y += b.vy * slow;
-    b.trail.push({x:b.x, y:b.y});
-    if (b.trail.length > 6) b.trail.shift();
-
-    if (b.x < box.x-40 || b.x > box.x+box.w+40 || b.y < box.y-40 || b.y > box.y+box.h+40){
-      bullets.splice(i,1); continue;
-    }
-
-    const dx = b.x - player.x, dy = b.y - player.y;
-    const dist = Math.hypot(dx, dy);
-
+    b.x += b.vx*slow; b.y += b.vy*slow;
+    b.trail.push({x:b.x,y:b.y}); if (b.trail.length>6) b.trail.shift();
+    if (b.x < box.x-40 || b.x > box.x+box.w+40 || b.y < box.y-40 || b.y > box.y+box.h+40){ bullets.splice(i,1); continue; }
+    const dx = b.x-player.x, dy = b.y-player.y;
+    const dist = Math.hypot(dx,dy);
     if (dist < b.r + player.size*0.6){
-      player.hp -= 2; player.focus = Math.max(0, player.focus - 15);
-      player.hurtFlash = 8; shake = 8; hitStop = 4; sfxHit();
+      player.hp -= 2; player.focus = Math.max(0, player.focus-15);
+      player.hurtFlash = 8; shake = 8; hitStop = 4; sfx.hit(); hurtCount++;
       for (let k=0;k<10;k++) spawnParticle(player.x, player.y, '#ff4a6a');
       bullets.splice(i,1);
       if (player.hp <= 0){ endBattle(false); return; }
     } else if (dist < b.r + player.size*2.2){
-      player.focus = Math.min(player.maxFocus, player.focus + 0.25);
-      if (Math.random() < 0.3) spawnParticle(player.x, player.y, '#6cf');
+      player.focus = Math.min(player.maxFocus, player.focus+0.25);
+      if (Math.random()<0.3) spawnParticle(player.x, player.y, '#6cf');
+    }
+  }
+
+  for (let i=pickups.length-1;i>=0;i--){
+    const p = pickups[i]; p.y += p.vy*slow;
+    if (p.y > box.y+box.h+20){ pickups.splice(i,1); continue; }
+    if (Math.hypot(p.x-player.x, p.y-player.y) < p.r + player.size){
+      score += 5; sfx.pickup();
+      for (let k=0;k<10;k++) spawnParticle(p.x, p.y, '#7dffa0');
+      pickups.splice(i,1);
+      setMessage('获得补丁：' + p.word + '（心智值 +5）');
     }
   }
 
@@ -396,196 +447,109 @@ function drawHeart(x,y,size,color,glow){
   if (glow){ ctx.shadowColor = color; ctx.shadowBlur = 18; }
   ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.moveTo(x, y + size*0.3);
-  ctx.bezierCurveTo(x, y, x - size, y, x - size, y + size*0.3);
-  ctx.bezierCurveTo(x - size, y + size*0.8, x, y + size*1.1, x, y + size*1.4);
-  ctx.bezierCurveTo(x, y + size*1.1, x + size, y + size*0.8, x + size, y + size*0.3);
-  ctx.bezierCurveTo(x + size, y, x, y, x, y + size*0.3);
-  ctx.fill();
-  ctx.restore();
+  ctx.moveTo(x, y+size*0.3);
+  ctx.bezierCurveTo(x,y,x-size,y,x-size,y+size*0.3);
+  ctx.bezierCurveTo(x-size,y+size*0.8,x,y+size*1.1,x,y+size*1.4);
+  ctx.bezierCurveTo(x,y+size*1.1,x+size,y+size*0.8,x+size,y+size*0.3);
+  ctx.bezierCurveTo(x+size,y,x,y,x,y+size*0.3);
+  ctx.fill(); ctx.restore();
 }
-
-function drawBar(x, y, w, h, ratio, color, bg){
-  ctx.fillStyle = bg; ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = color; ctx.fillRect(x, y, w*Math.max(0,Math.min(1,ratio)), h);
+function drawBar(x,y,w,h,ratio,color,bg){
+  ctx.fillStyle = bg; ctx.fillRect(x,y,w,h);
+  ctx.fillStyle = color; ctx.fillRect(x,y,w*Math.max(0,Math.min(1,ratio)),h);
   ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1;
-  ctx.strokeRect(x+0.5, y+0.5, w-1, h-1);
+  ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);
 }
-
-// 像素风敌人立绘
-function drawEnemy(cx, cy){
-  const breath = Math.sin(enemyBreath) * 3;
-  const color = mercyReady ? '#5ad68a' : '#d04a6a';
-  const dark = mercyReady ? '#2a8a5a' : '#8a2a4a';
-  ctx.save();
-  ctx.translate(cx, cy + breath);
-  ctx.rotate((Math.random()-0.5) * enemyShake * 0.02);
-
-  // 阴影
+function drawEnemy(cx,cy){
+  const breath = Math.sin(enemyBreath)*3;
+  ctx.save(); ctx.translate(cx, cy+breath);
+  ctx.rotate((Math.random()-0.5)*enemyShake*0.02);
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.beginPath(); ctx.ellipse(0, 40, 46, 10, 0, 0, Math.PI*2); ctx.fill();
-
-  // 身体
-  ctx.shadowColor = mercyReady ? 'rgba(90,214,138,0.6)' : 'rgba(208,74,106,0.6)';
-  ctx.shadowBlur = 24;
-  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.ellipse(0,40,46,10,0,0,Math.PI*2); ctx.fill();
+  ctx.shadowColor = 'rgba(208,74,106,0.6)'; ctx.shadowBlur = 24;
+  ctx.fillStyle = '#d04a6a';
   ctx.beginPath();
-  ctx.moveTo(0, -40);
-  ctx.lineTo(36, -14);
-  ctx.lineTo(30, 22);
-  ctx.lineTo(0, 38);
-  ctx.lineTo(-30, 22);
-  ctx.lineTo(-36, -14);
-  ctx.closePath();
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // 暗部
-  ctx.fillStyle = dark;
-  ctx.beginPath();
-  ctx.moveTo(0, -40);
-  ctx.lineTo(36, -14);
-  ctx.lineTo(30, 22);
-  ctx.lineTo(0, 38);
-  ctx.closePath();
-  ctx.fill();
-
-  // 眼睛
-  const eyeY = -6;
-  ctx.fillStyle = '#000';
-  ctx.fillRect(-18, eyeY, 10, 12);
-  ctx.fillRect(8, eyeY, 10, 12);
-  ctx.fillStyle = mercyReady ? '#bfffd0' : '#ffd0d8';
-  ctx.fillRect(-16, eyeY+2, 5, 5);
-  ctx.fillRect(10, eyeY+2, 5, 5);
-
-  // 嘴
+  ctx.moveTo(0,-40); ctx.lineTo(36,-14); ctx.lineTo(30,22); ctx.lineTo(0,38); ctx.lineTo(-30,22); ctx.lineTo(-36,-14);
+  ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
+  ctx.fillStyle = '#8a2a4a';
+  ctx.beginPath(); ctx.moveTo(0,-40); ctx.lineTo(36,-14); ctx.lineTo(30,22); ctx.lineTo(0,38); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#000'; ctx.fillRect(-18,-6,10,12); ctx.fillRect(8,-6,10,12);
+  ctx.fillStyle = '#ffd0d8'; ctx.fillRect(-16,-4,5,5); ctx.fillRect(10,-4,5,5);
   ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-  ctx.beginPath();
-  if (mercyReady){ ctx.arc(0, 12, 8, 0, Math.PI); }
-  else { ctx.moveTo(-8, 14); ctx.lineTo(8, 14); }
-  ctx.stroke();
-
+  ctx.beginPath(); ctx.moveTo(-8,14); ctx.lineTo(8,14); ctx.stroke();
   ctx.restore();
 }
 
 function draw(){
-  // 背景
-  const bg = ctx.createRadialGradient(W/2, H*0.35, 40, W/2, H*0.35, 500);
-  bg.addColorStop(0, '#12121f');
-  bg.addColorStop(1, '#050508');
+  const bg = ctx.createRadialGradient(W/2,H*0.35,40,W/2,H*0.35,500);
+  bg.addColorStop(0,'#12121f'); bg.addColorStop(1,'#050508');
   ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
-
-  // 星点
-  for (const s of stars){
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = '#8899cc';
-    ctx.fillRect(s.x, s.y, s.s, s.s);
-  }
+  for (const s of stars){ ctx.globalAlpha = 0.5; ctx.fillStyle = '#8899cc'; ctx.fillRect(s.x,s.y,s.s,s.s); }
   ctx.globalAlpha = 1;
 
   ctx.save();
-  if (shake > 0.5) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
+  if (shake > 0.5) ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
 
-  // 敌人
   drawEnemy(box.x + box.w/2, 110);
 
-  // 对话（逐字）
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 14px "Courier New",monospace';
-  ctx.fillText(typedMessage, 120, 175);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 14px "Courier New",monospace';
+  ctx.fillText(typedMessage, 90, 175);
 
-  // 战斗框贴图感：外发光 + 双层描边 + 角标
   ctx.save();
   ctx.shadowColor = 'rgba(120,150,255,0.35)'; ctx.shadowBlur = 18;
   ctx.strokeStyle = '#7a8ac0'; ctx.lineWidth = 4;
-  ctx.strokeRect(box.x, box.y, box.w, box.h);
+  ctx.strokeRect(box.x,box.y,box.w,box.h);
   ctx.restore();
   ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
-  ctx.strokeRect(box.x+5, box.y+5, box.w-10, box.h-10);
-  // 角标
+  ctx.strokeRect(box.x+5,box.y+5,box.w-10,box.h-10);
   ctx.fillStyle = '#7a8ac0';
   const cs = 8;
-  ctx.fillRect(box.x-2, box.y-2, cs, 2); ctx.fillRect(box.x-2, box.y-2, 2, cs);
-  ctx.fillRect(box.x+box.w-cs+2, box.y-2, cs, 2); ctx.fillRect(box.x+box.w, box.y-2, 2, cs);
-  ctx.fillRect(box.x-2, box.y+box.h, cs, 2); ctx.fillRect(box.x-2, box.y+box.h-cs+2, 2, cs);
-  ctx.fillRect(box.x+box.w-cs+2, box.y+box.h, cs, 2); ctx.fillRect(box.x+box.w, box.y+box.h-cs+2, 2, cs);
-
-  if (state === 'menu' || state === 'choose'){
-    const labels = ['行动', '仁慈', '—', '—'];
-    const cols = 4, cw = box.w / cols, ch = 36;
-    const startY = box.y + box.h/2 - ch/2;
-    ctx.font = 'bold 13px "Courier New",monospace';
-    ctx.textAlign = 'center';
-    for (let i = 0; i < cols; i++){
-      const cx = box.x + i*cw + cw/2;
-      const isActive = (state === 'choose' && i === currentMenu) || (state === 'menu' && i === 0);
-      const enabled = i < 2;
-      if (isActive){
-        ctx.fillStyle = 'rgba(255,210,63,0.15)';
-        ctx.fillRect(box.x + i*cw + 2, startY - 4, cw - 4, ch + 8);
-        ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 2;
-        ctx.strokeRect(box.x + i*cw + 2, startY - 4, cw - 4, ch + 8);
-      }
-      ctx.fillStyle = !enabled ? '#3a3a4a' : (isActive ? '#ffd23f' : '#6a6a8a');
-      ctx.fillText(labels[i], cx, startY + ch/2 + 5);
-    }
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#aab'; ctx.font = '12px "Courier New",monospace';
-    ctx.fillText(`交涉 ${talkPoints}/${TALK_NEEDED}` + (mercyReady ? ' · 仁慈可用' : ''), box.x + 20, box.y + box.h + 24);
-    if (state === 'choose') ctx.fillText('← → 切换 · Z 确认', box.x + 20, box.y + box.h + 42);
-  }
+  ctx.fillRect(box.x-2,box.y-2,cs,2); ctx.fillRect(box.x-2,box.y-2,2,cs);
+  ctx.fillRect(box.x+box.w-cs+2,box.y-2,cs,2); ctx.fillRect(box.x+box.w,box.y-2,2,cs);
+  ctx.fillRect(box.x-2,box.y+box.h,cs,2); ctx.fillRect(box.x-2,box.y+box.h-cs+2,2,cs);
+  ctx.fillRect(box.x+box.w-cs+2,box.y+box.h,cs,2); ctx.fillRect(box.x+box.w,box.y+box.h-cs+2,2,cs);
 
   if (state === 'battle'){
     for (const b of bullets){
       for (let i=0;i<b.trail.length;i++){
-        const t = b.trail[i];
-        const alpha = (i+1)/b.trail.length * 0.35;
-        ctx.beginPath(); ctx.arc(t.x, t.y, b.r*(i+1)/b.trail.length, 0, Math.PI*2);
-        ctx.fillStyle = b.type === 'track' ? `rgba(255,210,63,${alpha})` : (b.type==='heart'?`rgba(255,120,160,${alpha})`:`rgba(108,204,255,${alpha})`);
+        const t = b.trail[i], alpha = (i+1)/b.trail.length*0.35;
+        ctx.beginPath(); ctx.arc(t.x,t.y,b.r*(i+1)/b.trail.length,0,Math.PI*2);
+        ctx.fillStyle = b.type==='track'?`rgba(255,210,63,${alpha})`:(b.type==='heart'?`rgba(255,120,160,${alpha})`:`rgba(108,204,255,${alpha})`);
         ctx.fill();
       }
     }
     for (const b of bullets){
       ctx.save();
-      ctx.shadowColor = b.type === 'track' ? '#ffd23f' : (b.type==='heart'?'#ff78a0':'#6cf');
-      ctx.shadowBlur = 10;
-      if (b.type === 'heart'){
-        drawHeart(b.x, b.y - b.r, b.r*1.2, '#ff78a0', true);
-      } else {
-        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-        ctx.fillStyle = b.type === 'track' ? '#ffd23f' : '#6cf'; ctx.fill();
-      }
+      ctx.shadowColor = b.type==='track'?'#ffd23f':(b.type==='heart'?'#ff78a0':'#6cf'); ctx.shadowBlur = 10;
+      if (b.type==='heart'){ drawHeart(b.x,b.y-b.r,b.r*1.2,'#ff78a0',true); }
+      else { ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fillStyle = b.type==='track'?'#ffd23f':'#6cf'; ctx.fill(); }
       ctx.restore();
     }
-
+    for (const p of pickups){
+      ctx.save(); ctx.shadowColor = '#7dffa0'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#7dffa0'; ctx.fillRect(p.x-5,p.y-5,10,10);
+      ctx.fillStyle = '#0a2a1a'; ctx.fillRect(p.x-2,p.y-2,4,4);
+      ctx.restore();
+    }
     for (const p of particles){
-      ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+      ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x,p.y,p.size,p.size);
     }
     ctx.globalAlpha = 1;
 
-    const heartColor = player.hurtFlash > 0 ? '#fff' : (player.frozen>0 ? '#8cf' : '#ff2b4a');
-    drawHeart(player.x, player.y - player.size, player.size, heartColor, true);
+    const heartColor = player.hurtFlash>0?'#fff':(player.frozen>0?'#8cf':'#ff2b4a');
+    drawHeart(player.x, player.y-player.size, player.size, heartColor, true);
 
     if (player.frozen > 0){
       ctx.strokeStyle = 'rgba(140,200,255,0.5)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(player.x, player.y - player.size*0.7, player.size*2.2, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(player.x,player.y-player.size*0.7,player.size*2.2,0,Math.PI*2); ctx.stroke();
     }
 
     ctx.fillStyle = '#fff'; ctx.font = '13px "Courier New",monospace';
-    ctx.fillText('HP ' + Math.max(0,player.hp) + '/' + player.maxHp, box.x, box.y+box.h+22);
+    ctx.fillText('心智 ' + Math.max(0,player.hp) + '/' + player.maxHp + '   分数 ' + score, box.x, box.y+box.h+22);
     drawBar(box.x, box.y+box.h+28, box.w, 10, Math.max(0,player.hp)/player.maxHp, '#e33', '#2a1a1a');
     ctx.fillStyle = '#6cf';
     ctx.fillText('专注 ' + Math.floor(player.focus) + '%', box.x, box.y+box.h+50);
     drawBar(box.x, box.y+box.h+56, box.w, 8, player.focus/player.maxFocus, '#4cf', '#1a1a2a');
-  }
-
-  if (state === 'result'){
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 20px "Courier New",monospace';
-    ctx.fillText(resultText, 260, H/2 - 20);
-    ctx.fillStyle = '#8a8aa0'; ctx.font = '14px "Courier New",monospace';
-    ctx.fillText('点击「重开」再来一次', 260, H/2 + 20);
   }
 
   ctx.restore();
